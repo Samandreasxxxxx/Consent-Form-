@@ -699,13 +699,13 @@ function App() {
                     <span className="text-[10px] font-bold text-zinc-450 mb-1 text-center block">
                       Signature Pad (Draw here)
                     </span>
-                    <div className="w-full h-32 border border-zinc-200 rounded-2xl overflow-hidden bg-white p-1 relative shadow-sm">
+                    <div className="border border-zinc-200 rounded-2xl overflow-hidden bg-white p-1 relative shadow-sm">
                       <SignatureCanvas 
                         ref={sigPadRef}
                         penColor="black"
                         onEnd={handleDrawEnd}
                         canvasProps={{
-                          className: "w-full h-[120px] cursor-crosshair rounded-xl"
+                          className: "w-full h-32 cursor-crosshair rounded-xl"
                         }}
                       />
                       <button
