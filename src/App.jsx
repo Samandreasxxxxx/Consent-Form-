@@ -79,15 +79,34 @@ function App() {
       });
   }, []);
 
-  // Monitor waiver scrolling
-  const handleWaiverScroll = () => {
+  // Check if scrolling is needed or user reached the bottom
+  const checkWaiverScrollStatus = () => {
     if (waiverRef.current) {
       const { scrollTop, scrollHeight, clientHeight } = waiverRef.current;
-      if (scrollHeight - scrollTop - clientHeight < 10) {
+      // 1. If content fits completely (no scrollbar), auto-unlock.
+      // 2. Or, if the user scrolled to within 15px of the bottom, unlock.
+      if (scrollHeight <= clientHeight || scrollHeight - scrollTop - clientHeight < 15) {
         setScrolledToBottom(true);
       }
     }
   };
+
+  // Monitor waiver scrolling
+  const handleWaiverScroll = () => {
+    checkWaiverScrollStatus();
+  };
+
+  // Run scroll status checks on mount, resize, and when resets happen
+  useEffect(() => {
+    // Delay slightly to let the browser paint the layout first
+    const timer = setTimeout(checkWaiverScrollStatus, 300);
+    
+    window.addEventListener('resize', checkWaiverScrollStatus);
+    return () => {
+      clearTimeout(timer);
+      window.removeEventListener('resize', checkWaiverScrollStatus);
+    };
+  }, [formData.tripType, isSubmitted]);
 
   const handleInputChange = (e) => {
     const { name, value } = e.target;
