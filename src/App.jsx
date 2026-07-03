@@ -837,9 +837,9 @@ function App() {
           </div>
 
           {/* RIGHT COLUMN: Elongated Consent Waiver Box (col-span-7) */}
-          <div className="lg:col-span-7 space-y-6 flex flex-col h-full justify-between">
+          <div className="lg:col-span-7 flex flex-col h-full">
             
-            <div className="bg-slate-900/40 p-5 rounded-2xl border border-slate-800/80 flex flex-col h-full justify-between">
+            <div className="bg-slate-900/40 p-5 rounded-2xl border border-slate-800/80 flex flex-col h-full flex-1">
               <div className="flex items-center gap-2 border-b border-slate-800 pb-2 mb-3">
                 <FileText className="w-5 h-5 text-lime-400" />
                 <h2 className="text-base md:text-lg font-bold text-white">4. Review Consent Waiver</h2>
@@ -849,7 +849,7 @@ function App() {
               <div 
                 ref={waiverRef}
                 onScroll={handleWaiverScroll}
-                className="h-[360px] lg:h-[750px] overflow-y-auto border border-slate-800 rounded-2xl p-5 bg-slate-950/60 custom-scrollbar space-y-4 text-xs text-slate-300 leading-relaxed"
+                className="flex-1 overflow-y-auto border border-slate-800 rounded-2xl p-5 bg-slate-950/60 custom-scrollbar space-y-4 text-xs text-slate-300 leading-relaxed h-[360px] lg:h-auto"
               >
                 <h3 className="text-center font-extrabold text-slate-100 border-b border-slate-800 pb-3 text-[13px] tracking-wide">
                   TOUR TERMS, CONDITIONS, AND LIABILITY WAIVER
@@ -934,7 +934,7 @@ function App() {
               </div>
 
               {/* Checkbox wrapper */}
-              <div className="mt-4 flex items-start gap-3">
+              <div className="mt-4 flex items-start gap-3 border-t border-slate-800/60 pt-3">
                 <div className="flex items-center h-5">
                   <input
                     id="waiverCheckbox"
