@@ -22,7 +22,7 @@ import {
 } from 'lucide-react';
 
 // EmailJS placeholders. Users can modify these to connect their account.
-const EMAILJS_SERVICE_ID = "YOUR_SERVICE_ID";
+const EMAILJS_SERVICE_ID = "service_lc2lc5k";
 const EMAILJS_TEMPLATE_ID = "template_tcski2k";
 const EMAILJS_PUBLIC_KEY = "UAbxHvr8CObbDeOgD"; // Hardcoded Public Key
 
