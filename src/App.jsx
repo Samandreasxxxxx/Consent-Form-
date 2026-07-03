@@ -83,7 +83,6 @@ function App() {
   const handleWaiverScroll = () => {
     if (waiverRef.current) {
       const { scrollTop, scrollHeight, clientHeight } = waiverRef.current;
-      // If user scrolled within 10px of bottom, unlock agreement checkbox
       if (scrollHeight - scrollTop - clientHeight < 10) {
         setScrolledToBottom(true);
       }
@@ -149,7 +148,6 @@ function App() {
         canvas.height = height;
         ctx.drawImage(img, 0, 0, width, height);
 
-        // Analyze brightness & process background removal
         const imgData = ctx.getImageData(0, 0, width, height);
         const data = imgData.data;
         let totalBrightness = 0;
@@ -252,7 +250,6 @@ function App() {
     const tripDateString = today.toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' });
     const fullTimestampString = today.toLocaleString('en-US');
 
-    // Displayed name combines minor name and guardian name for template readability
     const customerDisplayName = isMinor 
       ? `${formData.fullName} (Minor - Parent/Guardian: ${formData.parentName})` 
       : formData.fullName;
@@ -293,54 +290,54 @@ function App() {
   // Render Success Component
   if (isSubmitted) {
     return (
-      <div className="min-h-screen bg-slate-900 flex items-center justify-center p-4 antialiased">
-        <div className="w-full max-w-lg bg-slate-800/80 backdrop-blur-xl border border-slate-700/50 rounded-3xl p-8 text-center shadow-2xl relative overflow-hidden">
-          <div className="absolute -top-12 -left-12 w-32 h-32 bg-rose-500/10 rounded-full blur-2xl"></div>
-          <div className="absolute -bottom-12 -right-12 w-32 h-32 bg-rose-500/10 rounded-full blur-2xl"></div>
+      <div className="min-h-screen bg-zinc-50 flex items-center justify-center p-4 antialiased text-zinc-800">
+        <div className="w-full max-w-lg bg-white border border-zinc-200 rounded-3xl p-8 text-center shadow-2xl relative overflow-hidden">
+          <div className="absolute -top-12 -left-12 w-32 h-32 bg-rose-500/5 rounded-full blur-2xl"></div>
+          <div className="absolute -bottom-12 -right-12 w-32 h-32 bg-rose-500/5 rounded-full blur-2xl"></div>
 
-          <div className="inline-flex items-center justify-center w-20 h-20 bg-rose-500/10 rounded-full mb-6 border border-rose-500/30 text-rose-400 relative">
+          <div className="inline-flex items-center justify-center w-20 h-20 bg-rose-50 rounded-full mb-6 border border-rose-100 text-rose-500 relative">
             <CheckCircle2 className="w-10 h-10 animate-bounce" />
             <div className="absolute inset-0 rounded-full border-2 border-rose-400/20 animate-ping"></div>
           </div>
 
-          <h2 className="text-3xl font-extrabold text-white mb-3">Waiver Submitted!</h2>
-          <p className="text-slate-300 mb-6 text-sm md:text-base leading-relaxed">
-            Thank you, <span className="font-semibold text-rose-400">{formData.fullName}</span>! Your waiver has been securely signed and submitted.
+          <h2 className="text-3xl font-extrabold text-zinc-900 mb-3">Waiver Submitted!</h2>
+          <p className="text-zinc-600 mb-6 text-sm md:text-base leading-relaxed">
+            Thank you, <span className="font-semibold text-rose-500">{formData.fullName}</span>! Your waiver has been securely signed and submitted.
           </p>
 
-          <div className="bg-slate-900/60 rounded-2xl p-5 mb-8 text-left border border-slate-700/30 space-y-3.5 text-xs text-slate-400">
-            <div className="flex justify-between items-center border-b border-slate-800 pb-2">
+          <div className="bg-zinc-50 rounded-2xl p-5 mb-8 text-left border border-zinc-200 space-y-3.5 text-xs text-zinc-500">
+            <div className="flex justify-between items-center border-b border-zinc-200 pb-2">
               <span>Trip Category:</span>
-              <span className="font-semibold text-white">{formData.tripType}</span>
+              <span className="font-semibold text-zinc-900">{formData.tripType}</span>
             </div>
-            <div className="flex justify-between items-center border-b border-slate-800 pb-2">
+            <div className="flex justify-between items-center border-b border-zinc-200 pb-2">
               <span>Submission Date:</span>
-              <span className="font-semibold text-white">{new Date().toLocaleDateString()}</span>
+              <span className="font-semibold text-zinc-900">{new Date().toLocaleDateString()}</span>
             </div>
-            <div className="flex justify-between items-center border-b border-slate-800 pb-2">
+            <div className="flex justify-between items-center border-b border-zinc-200 pb-2">
               <span>Registered Email:</span>
-              <span className="font-semibold text-white">{formData.email}</span>
+              <span className="font-semibold text-zinc-900">{formData.email}</span>
             </div>
             {isMinor && (
-              <div className="flex justify-between items-center border-b border-slate-800 pb-2">
+              <div className="flex justify-between items-center border-b border-zinc-200 pb-2">
                 <span>Parent/Guardian:</span>
-                <span className="font-semibold text-white">{formData.parentName}</span>
+                <span className="font-semibold text-zinc-900">{formData.parentName}</span>
               </div>
             )}
-            <div className="flex justify-between items-center border-b border-slate-800 pb-2">
+            <div className="flex justify-between items-center border-b border-zinc-200 pb-2">
               <span>System IP:</span>
-              <span className="font-semibold text-white">{ipAddress}</span>
+              <span className="font-semibold text-zinc-900">{ipAddress}</span>
             </div>
             <div className="flex justify-between items-center">
               <span>Delivery Status:</span>
-              <span className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-[10px] font-bold bg-rose-500/10 text-rose-400 border border-rose-500/20">
-                <span className="w-1.5 h-1.5 rounded-full bg-rose-400 animate-pulse"></span>
+              <span className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-[10px] font-bold bg-rose-50 text-rose-600 border border-rose-100">
+                <span className="w-1.5 h-1.5 rounded-full bg-rose-500 animate-pulse"></span>
                 Securely Dispatched
               </span>
             </div>
           </div>
 
-          <p className="text-slate-400 text-xs mb-6">
+          <p className="text-zinc-400 text-xs mb-6">
             A confirmation copy with your details and signature has been sent to your email.
           </p>
 
@@ -361,7 +358,7 @@ function App() {
               setIsWaiverRead(false);
               setScrolledToBottom(false);
             }}
-            className="w-full inline-flex items-center justify-center gap-2 px-6 py-3.5 rounded-2xl bg-rose-500 hover:bg-rose-400 text-white font-bold transition-all duration-200 shadow-lg shadow-rose-500/20 hover:shadow-rose-500/35 focus:ring-2 focus:ring-rose-500/50"
+            className="w-full inline-flex items-center justify-center gap-2 px-6 py-3.5 rounded-2xl bg-rose-600 hover:bg-rose-500 text-white font-bold transition-all duration-200 shadow-md shadow-rose-600/10 hover:shadow-rose-600/25 focus:ring-2 focus:ring-rose-500/50"
           >
             Sign Another Consent Form
           </button>
@@ -371,68 +368,68 @@ function App() {
   }
 
   return (
-    <div className="min-h-screen bg-slate-950 py-8 px-4 sm:px-6 lg:px-8 text-slate-100 flex flex-col items-center antialiased">
+    <div className="min-h-screen bg-zinc-50 py-8 px-4 sm:px-6 lg:px-8 text-zinc-800 flex flex-col items-center antialiased">
       {/* Hidden processing canvas */}
       <canvas ref={canvasRef} className="hidden" />
 
       {/* Main Container */}
-      <div className="w-full max-w-7xl bg-slate-900/60 backdrop-blur-xl border border-slate-800 shadow-2xl rounded-3xl overflow-hidden relative">
+      <div className="w-full max-w-7xl bg-white border border-zinc-200 shadow-xl rounded-3xl overflow-hidden relative">
         
-        {/* Glow gradients */}
-        <div className="absolute top-0 right-0 w-96 h-96 bg-rose-500/5 rounded-full blur-3xl -z-10 pointer-events-none"></div>
-        <div className="absolute bottom-0 left-0 w-96 h-96 bg-rose-500/5 rounded-full blur-3xl -z-10 pointer-events-none"></div>
+        {/* Subtle glow backdrops */}
+        <div className="absolute top-0 right-0 w-96 h-96 bg-rose-500/2 rounded-full blur-3xl -z-10 pointer-events-none"></div>
+        <div className="absolute bottom-0 left-0 w-96 h-96 bg-emerald-500/2 rounded-full blur-3xl -z-10 pointer-events-none"></div>
 
         {/* Company Header */}
-        <div className="pt-8 pb-6 text-center border-b border-slate-800 bg-slate-900/40 px-4">
+        <div className="pt-8 pb-6 text-center border-b border-zinc-100 bg-zinc-50/50 px-4">
           <img 
             src="/logo.png" 
             alt="Ghumoo With Us" 
-            className="mx-auto w-32 md:w-36 h-auto object-contain rounded-full shadow-lg border border-slate-800 p-1 mb-4 hover:scale-105 transition-transform duration-300"
+            className="mx-auto w-32 md:w-36 h-auto object-contain rounded-full shadow-md border border-zinc-200 p-1 mb-4 hover:scale-105 transition-transform duration-300"
             onError={(e) => {
               e.target.style.display = 'none';
             }}
           />
-          <h1 className="text-3xl font-black tracking-tight text-white sm:text-4xl">
+          <h1 className="text-3xl font-black tracking-tight text-zinc-900 sm:text-4xl">
             GHUMOO WITH US
           </h1>
-          <p className="mt-2 text-slate-400 text-sm md:text-base font-semibold max-w-md mx-auto">
+          <p className="mt-2 text-zinc-500 text-sm md:text-base font-semibold max-w-md mx-auto">
             Digital Waiver & Tour Consent Form
           </p>
         </div>
 
         {/* Developer Sandbox Panel */}
-        <div className="bg-slate-950/60 border-b border-slate-800/80 p-4 text-xs">
+        <div className="bg-zinc-50 border-b border-zinc-150 p-4 text-xs text-zinc-600">
           <details className="cursor-pointer group">
-            <summary className="font-semibold text-rose-400 hover:text-rose-300 flex items-center gap-2 list-none select-none">
+            <summary className="font-semibold text-rose-600 hover:text-rose-500 flex items-center gap-2 list-none select-none">
               <Sparkles className="w-3.5 h-3.5" />
               <span>Developer Panel: Configure EmailJS Keys (Click to expand)</span>
             </summary>
             <div className="mt-3 grid grid-cols-1 md:grid-cols-3 gap-3 pt-2">
               <div>
-                <label className="block text-slate-400 font-bold mb-1">Service ID</label>
+                <label className="block text-zinc-500 font-bold mb-1">Service ID</label>
                 <input 
                   type="text" 
                   value={serviceId} 
                   onChange={(e) => setServiceId(e.target.value)}
-                  className="w-full bg-slate-900 border border-slate-800 rounded px-2 py-1 text-white focus:outline-none focus:ring-1 focus:ring-rose-500"
+                  className="w-full bg-white border border-zinc-300 rounded px-2 py-1 text-zinc-900 focus:outline-none focus:ring-1 focus:ring-rose-500"
                 />
               </div>
               <div>
-                <label className="block text-slate-400 font-bold mb-1">Template ID</label>
+                <label className="block text-zinc-500 font-bold mb-1">Template ID</label>
                 <input 
                   type="text" 
                   value={templateId} 
                   onChange={(e) => setTemplateId(e.target.value)}
-                  className="w-full bg-slate-900 border border-slate-800 rounded px-2 py-1 text-white focus:outline-none focus:ring-1 focus:ring-rose-500"
+                  className="w-full bg-white border border-zinc-300 rounded px-2 py-1 text-zinc-900 focus:outline-none focus:ring-1 focus:ring-rose-500"
                 />
               </div>
               <div>
-                <label className="block text-slate-400 font-bold mb-1">Public Key</label>
+                <label className="block text-zinc-500 font-bold mb-1">Public Key</label>
                 <input 
                   type="text" 
                   value={publicKey} 
                   onChange={(e) => setPublicKey(e.target.value)}
-                  className="w-full bg-slate-900 border border-slate-800 rounded px-2 py-1 text-white focus:outline-none focus:ring-1 focus:ring-rose-500"
+                  className="w-full bg-white border border-zinc-300 rounded px-2 py-1 text-zinc-900 focus:outline-none focus:ring-1 focus:ring-rose-500"
                 />
               </div>
             </div>
@@ -446,14 +443,14 @@ function App() {
           <div className="lg:col-span-5 space-y-6">
             
             {/* Section 1: Trip Details */}
-            <div className="bg-slate-900/40 p-5 rounded-2xl border border-slate-800/80">
-              <div className="flex items-center gap-2 border-b border-slate-800 pb-2 mb-4">
-                <MapPin className="w-5 h-5 text-rose-400" />
-                <h2 className="text-base md:text-lg font-bold text-white">1. Select Trip Details</h2>
+            <div className="bg-white p-5 rounded-2xl border border-zinc-200 shadow-sm">
+              <div className="flex items-center gap-2 border-b border-zinc-100 pb-2 mb-4">
+                <MapPin className="w-5 h-5 text-rose-500" />
+                <h2 className="text-base md:text-lg font-bold text-zinc-900">1. Select Trip Details</h2>
               </div>
               
               <div>
-                <label htmlFor="tripType" className="block text-xs font-semibold text-slate-300 mb-2">
+                <label htmlFor="tripType" className="block text-xs font-semibold text-zinc-600 mb-2">
                   Trip Type *
                 </label>
                 <div className="relative">
@@ -462,14 +459,14 @@ function App() {
                     name="tripType"
                     value={formData.tripType}
                     onChange={handleInputChange}
-                    className="w-full bg-slate-950/80 border border-slate-800 rounded-xl px-4 py-3 text-slate-100 font-medium focus:ring-2 focus:ring-rose-500 focus:border-transparent transition-all duration-200 appearance-none text-sm"
+                    className="w-full bg-white border border-zinc-300 rounded-xl px-4 py-3 text-zinc-900 font-medium focus:ring-2 focus:ring-rose-500 focus:border-transparent transition-all duration-200 appearance-none text-sm cursor-pointer"
                     required
                   >
                     {TRIP_TYPES.map(t => (
                       <option key={t} value={t}>{t}</option>
                     ))}
                   </select>
-                  <div className="absolute inset-y-0 right-0 flex items-center px-4 pointer-events-none text-slate-400">
+                  <div className="absolute inset-y-0 right-0 flex items-center px-4 pointer-events-none text-zinc-400">
                     ▼
                   </div>
                 </div>
@@ -477,18 +474,18 @@ function App() {
             </div>
 
             {/* Section 2: Registrant Details */}
-            <div className="bg-slate-900/40 p-5 rounded-2xl border border-slate-800/80 space-y-5">
-              <div className="flex items-center gap-2 border-b border-slate-800 pb-2 mb-1">
-                <User className="w-5 h-5 text-rose-400" />
-                <h2 className="text-base md:text-lg font-bold text-white">2. Personal Information</h2>
+            <div className="bg-white p-5 rounded-2xl border border-zinc-200 shadow-sm space-y-5">
+              <div className="flex items-center gap-2 border-b border-zinc-100 pb-2 mb-1">
+                <User className="w-5 h-5 text-rose-500" />
+                <h2 className="text-base md:text-lg font-bold text-zinc-900">2. Personal Information</h2>
               </div>
 
               <div>
-                <label htmlFor="fullName" className="block text-xs font-semibold text-slate-300 mb-2">
+                <label htmlFor="fullName" className="block text-xs font-semibold text-zinc-600 mb-2">
                   Full Legal Name *
                 </label>
                 <div className="relative">
-                  <span className="absolute inset-y-0 left-0 pl-3.5 flex items-center text-slate-500 pointer-events-none">
+                  <span className="absolute inset-y-0 left-0 pl-3.5 flex items-center text-zinc-400 pointer-events-none">
                     <User className="w-4 h-4" />
                   </span>
                   <input
@@ -498,7 +495,7 @@ function App() {
                     placeholder="John Doe"
                     value={formData.fullName}
                     onChange={handleInputChange}
-                    className="w-full bg-slate-950/80 border border-slate-800 rounded-xl pl-10 pr-4 py-3 text-slate-100 placeholder-slate-500 focus:ring-2 focus:ring-rose-500 focus:border-transparent transition-all duration-200 text-sm"
+                    className="w-full bg-white border border-zinc-300 rounded-xl pl-10 pr-4 py-3 text-zinc-900 placeholder-zinc-400 focus:ring-2 focus:ring-rose-500 focus:border-transparent transition-all duration-200 text-sm"
                     required
                   />
                 </div>
@@ -506,11 +503,11 @@ function App() {
 
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div>
-                  <label htmlFor="email" className="block text-xs font-semibold text-slate-300 mb-2">
+                  <label htmlFor="email" className="block text-xs font-semibold text-zinc-600 mb-2">
                     Email Address *
                   </label>
                   <div className="relative">
-                    <span className="absolute inset-y-0 left-0 pl-3.5 flex items-center text-slate-500 pointer-events-none">
+                    <span className="absolute inset-y-0 left-0 pl-3.5 flex items-center text-zinc-400 pointer-events-none">
                       <Mail className="w-4 h-4" />
                     </span>
                     <input
@@ -520,14 +517,14 @@ function App() {
                       placeholder="john@email.com"
                       value={formData.email}
                       onChange={handleInputChange}
-                      className="w-full bg-slate-950/80 border border-slate-800 rounded-xl pl-10 pr-4 py-3 text-slate-100 placeholder-slate-500 focus:ring-2 focus:ring-rose-500 focus:border-transparent transition-all duration-200 text-sm"
+                      className="w-full bg-white border border-zinc-300 rounded-xl pl-10 pr-4 py-3 text-zinc-900 placeholder-zinc-400 focus:ring-2 focus:ring-rose-500 focus:border-transparent transition-all duration-200 text-sm"
                       required
                     />
                   </div>
                 </div>
 
                 <div>
-                  <label htmlFor="age" className="block text-xs font-semibold text-slate-300 mb-2">
+                  <label htmlFor="age" className="block text-xs font-semibold text-zinc-600 mb-2">
                     Age *
                   </label>
                   <input
@@ -539,7 +536,7 @@ function App() {
                     placeholder="e.g., 25"
                     value={formData.age}
                     onChange={handleInputChange}
-                    className="w-full bg-slate-950/80 border border-slate-800 rounded-xl px-4 py-3 text-slate-100 placeholder-slate-500 focus:ring-2 focus:ring-rose-500 focus:border-transparent transition-all duration-200 text-sm"
+                    className="w-full bg-white border border-zinc-300 rounded-xl px-4 py-3 text-zinc-900 placeholder-zinc-400 focus:ring-2 focus:ring-rose-500 focus:border-transparent transition-all duration-200 text-sm"
                     required
                   />
                 </div>
@@ -547,17 +544,17 @@ function App() {
 
               {/* Dynamic Minor Parent/Guardian Field */}
               {isMinor && (
-                <div className="animate-fade-in bg-amber-500/5 border border-amber-500/20 p-4 rounded-xl space-y-3">
-                  <div className="flex items-center gap-2 text-amber-400 font-semibold text-xs">
-                    <HeartHandshake className="w-4 h-4 shrink-0" />
+                <div className="animate-fade-in bg-amber-50 border border-amber-200 p-4 rounded-xl space-y-3">
+                  <div className="flex items-center gap-2 text-amber-800 font-semibold text-xs">
+                    <HeartHandshake className="w-4 h-4 shrink-0 text-amber-600" />
                     <span>Minor Consent Required (Age under 18)</span>
                   </div>
                   <div>
-                    <label htmlFor="parentName" className="block text-xs font-semibold text-slate-300 mb-2">
+                    <label htmlFor="parentName" className="block text-xs font-semibold text-zinc-700 mb-2">
                       Parent / Guardian Full Name *
                     </label>
                     <div className="relative">
-                      <span className="absolute inset-y-0 left-0 pl-3.5 flex items-center text-slate-500 pointer-events-none">
+                      <span className="absolute inset-y-0 left-0 pl-3.5 flex items-center text-zinc-400 pointer-events-none">
                         <User className="w-4 h-4" />
                       </span>
                       <input
@@ -567,7 +564,7 @@ function App() {
                         placeholder="Guardian's Legal Name"
                         value={formData.parentName}
                         onChange={handleInputChange}
-                        className="w-full bg-slate-950/80 border border-amber-500/30 rounded-xl pl-10 pr-4 py-3 text-slate-100 placeholder-slate-500 focus:ring-2 focus:ring-amber-500 focus:border-transparent transition-all duration-200 text-sm"
+                        className="w-full bg-white border border-amber-300 rounded-xl pl-10 pr-4 py-3 text-zinc-900 placeholder-zinc-400 focus:ring-2 focus:ring-rose-500 focus:border-transparent transition-all duration-200 text-sm"
                         required={isMinor}
                       />
                     </div>
@@ -577,11 +574,11 @@ function App() {
 
               <div className="grid grid-cols-1 gap-4">
                 <div>
-                  <label htmlFor="mobile" className="block text-xs font-semibold text-slate-300 mb-2">
+                  <label htmlFor="mobile" className="block text-xs font-semibold text-zinc-600 mb-2">
                     Mobile Number *
                   </label>
                   <div className="relative">
-                    <span className="absolute inset-y-0 left-0 pl-3.5 flex items-center text-slate-500 pointer-events-none">
+                    <span className="absolute inset-y-0 left-0 pl-3.5 flex items-center text-zinc-400 pointer-events-none">
                       <Phone className="w-4 h-4" />
                     </span>
                     <input
@@ -591,16 +588,16 @@ function App() {
                       placeholder="e.g., +91 98765 43210"
                       value={formData.mobile}
                       onChange={handleInputChange}
-                      className="w-full bg-slate-950/80 border border-slate-800 rounded-xl pl-10 pr-4 py-3 text-slate-100 placeholder-slate-500 focus:ring-2 focus:ring-rose-500 focus:border-transparent transition-all duration-200 text-sm"
+                      className="w-full bg-white border border-zinc-300 rounded-xl pl-10 pr-4 py-3 text-zinc-900 placeholder-zinc-400 focus:ring-2 focus:ring-rose-500 focus:border-transparent transition-all duration-200 text-sm"
                       required
                     />
                   </div>
                 </div>
 
-                <div className="bg-slate-950/40 p-4 rounded-xl border border-slate-800/80 grid grid-cols-2 gap-3">
-                  <div className="col-span-2 text-xs font-bold text-slate-300 mb-0.5">Emergency Contact Details</div>
+                <div className="bg-zinc-50 p-4 rounded-xl border border-zinc-200 grid grid-cols-2 gap-3">
+                  <div className="col-span-2 text-xs font-bold text-zinc-700 mb-0.5">Emergency Contact Details</div>
                   <div>
-                    <label htmlFor="emergencyContactName" className="block text-[10px] font-bold text-slate-400 mb-1">
+                    <label htmlFor="emergencyContactName" className="block text-[10px] font-bold text-zinc-500 mb-1">
                       Emergency Name *
                     </label>
                     <input
@@ -610,12 +607,12 @@ function App() {
                       placeholder="Relation / Name"
                       value={formData.emergencyContactName}
                       onChange={handleInputChange}
-                      className="w-full bg-slate-950/80 border border-slate-800 rounded-lg px-3 py-2 text-slate-100 placeholder-slate-600 focus:ring-1 focus:ring-rose-500 focus:border-transparent transition-all text-xs"
+                      className="w-full bg-white border border-zinc-300 rounded-lg px-3 py-2 text-zinc-900 placeholder-zinc-400 focus:ring-1 focus:ring-rose-500 focus:border-transparent transition-all text-xs"
                       required
                     />
                   </div>
                   <div>
-                    <label htmlFor="emergencyContactPhone" className="block text-[10px] font-bold text-slate-400 mb-1">
+                    <label htmlFor="emergencyContactPhone" className="block text-[10px] font-bold text-zinc-500 mb-1">
                       Emergency Phone *
                     </label>
                     <input
@@ -625,7 +622,7 @@ function App() {
                       placeholder="Contact No."
                       value={formData.emergencyContactPhone}
                       onChange={handleInputChange}
-                      className="w-full bg-slate-950/80 border border-slate-800 rounded-lg px-3 py-2 text-slate-100 placeholder-slate-600 focus:ring-1 focus:ring-rose-500 focus:border-transparent transition-all text-xs"
+                      className="w-full bg-white border border-zinc-300 rounded-lg px-3 py-2 text-zinc-900 placeholder-zinc-400 focus:ring-1 focus:ring-rose-500 focus:border-transparent transition-all text-xs"
                       required
                     />
                   </div>
@@ -634,29 +631,29 @@ function App() {
             </div>
 
             {/* Section 3: Signature Component */}
-            <div className="bg-slate-900/40 p-5 rounded-2xl border border-slate-800/80 space-y-4">
-              <div className="flex items-center gap-2 border-b border-slate-800 pb-2">
-                <PenTool className="w-5 h-5 text-rose-400" />
-                <h2 className="text-base md:text-lg font-bold text-white">
+            <div className="bg-white p-5 rounded-2xl border border-zinc-200 shadow-sm space-y-4">
+              <div className="flex items-center gap-2 border-b border-zinc-100 pb-2">
+                <PenTool className="w-5 h-5 text-rose-500" />
+                <h2 className="text-base md:text-lg font-bold text-zinc-900">
                   {isMinor ? "3. Parent / Guardian Consent Signature" : "3. Provide Consent Signature"}
                 </h2>
               </div>
               
-              <p className="text-xs text-slate-400">
+              <p className="text-xs text-zinc-500">
                 {isMinor 
                   ? "As the participant is a minor, the parent/guardian must sign below."
                   : "Please choose your signature format: draw on the pad or upload an image."}
               </p>
 
               {/* Method Tabs */}
-              <div className="flex border-b border-slate-800 max-w-xs">
+              <div className="flex border-b border-zinc-200 max-w-xs">
                 <button
                   type="button"
                   onClick={() => handleTabChange('draw')}
                   className={`flex-1 pb-2 text-xs font-semibold border-b-2 text-center transition-all duration-200 ${
                     signatureMethod === 'draw' 
-                      ? 'border-rose-500 text-rose-400' 
-                      : 'border-transparent text-slate-400 hover:text-slate-200'
+                      ? 'border-rose-500 text-rose-500' 
+                      : 'border-transparent text-zinc-400 hover:text-zinc-600'
                   }`}
                 >
                   ✏️ Draw Pad
@@ -666,8 +663,8 @@ function App() {
                   onClick={() => handleTabChange('upload')}
                   className={`flex-1 pb-2 text-xs font-semibold border-b-2 text-center transition-all duration-200 ${
                     signatureMethod === 'upload' 
-                      ? 'border-rose-500 text-rose-400' 
-                      : 'border-transparent text-slate-400 hover:text-slate-200'
+                      ? 'border-rose-500 text-rose-500' 
+                      : 'border-transparent text-zinc-400 hover:text-zinc-600'
                   }`}
                 >
                   📂 Upload Photo
@@ -680,7 +677,7 @@ function App() {
                 {/* Tab 1: Draw Signature Pad */}
                 {signatureMethod === 'draw' && (
                   <div>
-                    <div className="border border-slate-700 rounded-2xl overflow-hidden bg-white p-1">
+                    <div className="border border-zinc-200 rounded-2xl overflow-hidden bg-white p-1">
                       <SignatureCanvas 
                         ref={sigPadRef}
                         penColor="black"
@@ -693,7 +690,7 @@ function App() {
                     <button
                       type="button"
                       onClick={handleClearDraw}
-                      className="mt-2 bg-slate-850 hover:bg-slate-800 text-slate-300 font-semibold px-3 py-1.5 rounded-xl text-[10px] border border-slate-700 flex items-center gap-1.5 shadow transition-colors"
+                      className="mt-2 bg-zinc-100 hover:bg-zinc-200 text-zinc-700 font-semibold px-3 py-1.5 rounded-xl text-[10px] border border-zinc-200 flex items-center gap-1.5 shadow-sm transition-colors"
                     >
                       <RefreshCw className="w-2.5 h-2.5" />
                       Clear Signature Pad
@@ -716,28 +713,28 @@ function App() {
                     <button
                       type="button"
                       onClick={() => fileInputRef.current?.click()}
-                      className="w-full flex flex-col items-center justify-center border border-slate-800 hover:border-rose-500 hover:bg-slate-850/50 rounded-2xl p-4 transition-all duration-200 cursor-pointer text-center group bg-slate-950/20"
+                      className="w-full flex flex-col items-center justify-center border border-zinc-200 hover:border-rose-500 hover:bg-rose-50/20 rounded-2xl p-4 transition-all duration-200 cursor-pointer text-center group bg-zinc-50"
                     >
-                      <div className="w-10 h-10 bg-slate-950/80 rounded-full flex items-center justify-center text-slate-400 group-hover:text-rose-400 mb-2 border border-slate-800 transition-colors">
+                      <div className="w-10 h-10 bg-white rounded-full flex items-center justify-center text-zinc-400 group-hover:text-rose-500 mb-2 border border-zinc-200 transition-colors shadow-sm">
                         {isProcessingUpload ? (
-                          <Loader2 className="w-5 h-5 animate-spin text-rose-400" />
+                          <Loader2 className="w-5 h-5 animate-spin text-rose-500" />
                         ) : (
                           <Upload className="w-5 h-5" />
                         )}
                       </div>
-                      <span className="block text-xs font-semibold text-slate-200">
+                      <span className="block text-xs font-semibold text-zinc-700">
                         {isProcessingUpload ? 'Processing Signature...' : 'Select Signature Photo'}
                       </span>
-                      <span className="block text-[10px] text-slate-500 mt-0.5">
+                      <span className="block text-[10px] text-zinc-450 mt-0.5">
                         Dark ink on white paper
                       </span>
                     </button>
 
                     {signatureWarning && (
-                      <div className="mt-3 flex items-start gap-2 bg-red-950/40 border border-red-900/60 rounded-xl p-2.5 text-red-300 text-[10px]">
-                        <AlertCircle className="w-3.5 h-3.5 shrink-0 text-red-400 mt-0.5" />
+                      <div className="mt-3 flex items-start gap-2 bg-red-50 border border-red-200 rounded-xl p-2.5 text-red-700 text-[10px]">
+                        <AlertCircle className="w-3.5 h-3.5 shrink-0 text-red-500 mt-0.5" />
                         <div>
-                          <p className="font-semibold text-red-200">Contrast Warning</p>
+                          <p className="font-semibold text-red-800">Contrast Warning</p>
                           <p className="mt-0.5">{signatureWarning}</p>
                         </div>
                       </div>
@@ -747,11 +744,11 @@ function App() {
 
                 {/* Signature Preview Frame */}
                 <div className="flex flex-col items-center">
-                  <span className="text-[10px] font-bold text-slate-400 mb-1">
+                  <span className="text-[10px] font-bold text-zinc-400 mb-1">
                     Transparent Preview
                   </span>
                   
-                  <div className="w-full h-32 rounded-2xl border border-slate-800 transparency-grid flex items-center justify-center overflow-hidden relative bg-slate-950/60 p-2 shadow-inner">
+                  <div className="w-full h-32 rounded-2xl border border-zinc-200 transparency-grid flex items-center justify-center overflow-hidden relative bg-zinc-50 p-2 shadow-inner">
                     {signatureImage ? (
                       <>
                         <img 
@@ -763,7 +760,7 @@ function App() {
                           <button
                             type="button"
                             onClick={handleClearUpload}
-                            className="absolute bottom-2 right-2 bg-slate-800 hover:bg-slate-750 text-slate-300 font-semibold px-2 py-0.5 rounded text-[9px] border border-slate-700 flex items-center gap-0.5 shadow transition-colors"
+                            className="absolute bottom-2 right-2 bg-white hover:bg-zinc-100 text-zinc-700 font-semibold px-2 py-0.5 rounded text-[9px] border border-zinc-200 flex items-center gap-0.5 shadow transition-colors"
                           >
                             <RefreshCw className="w-2.5 h-2.5" />
                             Clear
@@ -771,8 +768,8 @@ function App() {
                         )}
                       </>
                     ) : (
-                      <div className="text-slate-600 text-[10px] flex flex-col items-center gap-1">
-                        <PenTool className="w-4 h-4 text-slate-750" />
+                      <div className="text-zinc-400 text-[10px] flex flex-col items-center gap-1">
+                        <PenTool className="w-4 h-4 text-zinc-300" />
                         <span>{signatureMethod === 'draw' ? 'Draw on pad' : 'Upload photo'}</span>
                       </div>
                     )}
@@ -783,32 +780,32 @@ function App() {
             </div>
 
             {/* Audit Trail Metadata View */}
-            <div className="bg-slate-950/50 rounded-2xl p-4 border border-slate-850 text-[10px] text-slate-400 space-y-1">
-              <span className="font-bold text-slate-300 tracking-wider text-xs block mb-0.5">
+            <div className="bg-zinc-50 rounded-2xl p-4 border border-zinc-200 text-[10px] text-zinc-500 space-y-1 shadow-inner">
+              <span className="font-bold text-zinc-700 tracking-wider text-xs block mb-0.5">
                 DIGITAL AUDIT TRAIL METADATA
               </span>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-1 md:gap-4">
                 <div>
-                  <span className="font-semibold text-slate-500">System IP Address: </span>
-                  <span className="text-slate-300">{ipAddress}</span>
+                  <span className="font-semibold text-zinc-400">System IP Address: </span>
+                  <span className="text-zinc-600">{ipAddress}</span>
                 </div>
                 <div>
-                  <span className="font-semibold text-slate-500">Document Timestamp: </span>
-                  <span className="text-slate-300">{new Date().toLocaleString()}</span>
+                  <span className="font-semibold text-zinc-400">Document Timestamp: </span>
+                  <span className="text-zinc-600">{new Date().toLocaleString()}</span>
                 </div>
               </div>
-              <div className="pt-1 border-t border-slate-900">
-                <span className="font-semibold text-slate-500">User Agent: </span>
-                <span className="text-slate-300 break-all">{navigator.userAgent}</span>
+              <div className="pt-1 border-t border-zinc-200">
+                <span className="font-semibold text-zinc-400">User Agent: </span>
+                <span className="text-zinc-600 break-all">{navigator.userAgent}</span>
               </div>
             </div>
 
             {/* Submit Action Block */}
             {submitError && (
-              <div className="flex items-start gap-2 bg-red-950/40 border border-red-900/60 rounded-2xl p-4 text-red-300 text-xs">
-                <ShieldAlert className="w-5 h-5 text-red-400 shrink-0 mt-0.5" />
+              <div className="flex items-start gap-2 bg-red-50 border border-red-200 rounded-2xl p-4 text-red-700 text-xs">
+                <ShieldAlert className="w-5 h-5 text-red-500 shrink-0 mt-0.5" />
                 <div>
-                  <p className="font-semibold text-red-200">Submission Blocked</p>
+                  <p className="font-semibold text-red-800">Submission Blocked</p>
                   <p className="mt-0.5">{submitError}</p>
                 </div>
               </div>
@@ -818,11 +815,11 @@ function App() {
               <button
                 type="submit"
                 disabled={isSubmitting || !isWaiverRead || !signatureImage || !!signatureWarning}
-                className="w-full flex items-center justify-center gap-2.5 px-6 py-4 rounded-2xl bg-gradient-to-r from-rose-500 to-rose-600 hover:from-rose-400 hover:to-rose-500 text-white font-extrabold transition-all duration-200 shadow-xl shadow-rose-500/5 disabled:opacity-50 disabled:cursor-not-allowed focus:ring-2 focus:ring-rose-500/50 text-sm cursor-pointer"
+                className="w-full flex items-center justify-center gap-2.5 px-6 py-4 rounded-2xl bg-gradient-to-r from-rose-600 to-rose-700 hover:from-rose-500 hover:to-rose-650 text-white font-extrabold transition-all duration-200 shadow-md shadow-rose-500/10 disabled:opacity-50 disabled:cursor-not-allowed focus:ring-2 focus:ring-rose-500/50 text-sm cursor-pointer"
               >
                 {isSubmitting ? (
                   <>
-                    <Loader2 className="w-4 h-4 animate-spin" />
+                    <Loader2 className="w-4 h-4 animate-spin text-white" />
                     Submitting Consent Form...
                   </>
                 ) : (
@@ -839,102 +836,102 @@ function App() {
           {/* RIGHT COLUMN: Elongated Consent Waiver Box (col-span-7) */}
           <div className="lg:col-span-7 flex flex-col h-full">
             
-            <div className="bg-slate-900/40 p-5 rounded-2xl border border-slate-800/80 flex flex-col h-full flex-1">
-              <div className="flex items-center gap-2 border-b border-slate-800 pb-2 mb-3">
-                <FileText className="w-5 h-5 text-rose-400" />
-                <h2 className="text-base md:text-lg font-bold text-white">4. Review Consent Waiver</h2>
+            <div className="bg-white p-5 rounded-2xl border border-zinc-200 flex flex-col h-full flex-1 shadow-sm">
+              <div className="flex items-center gap-2 border-b border-zinc-100 pb-2 mb-3">
+                <FileText className="w-5 h-5 text-rose-500" />
+                <h2 className="text-base md:text-lg font-bold text-zinc-900">4. Review Consent Waiver</h2>
               </div>
               
               {/* Elongated scrolling waiver content */}
               <div 
                 ref={waiverRef}
                 onScroll={handleWaiverScroll}
-                className="flex-1 overflow-y-auto border border-slate-800 rounded-2xl p-5 bg-slate-950/60 custom-scrollbar space-y-4 text-xs text-slate-300 leading-relaxed h-[360px] lg:h-auto"
+                className="flex-1 overflow-y-auto border border-zinc-200 rounded-2xl p-5 bg-zinc-50 custom-scrollbar space-y-4 text-xs text-zinc-655 leading-relaxed h-[360px] lg:h-auto"
               >
-                <h3 className="text-center font-extrabold text-slate-100 border-b border-slate-800 pb-3 text-[13px] tracking-wide">
+                <h3 className="text-center font-extrabold text-zinc-900 border-b border-zinc-200 pb-3 text-[13px] tracking-wide">
                   TOUR TERMS, CONDITIONS, AND LIABILITY WAIVER
                 </h3>
                 
-                <p className="italic text-slate-400 text-center text-[11px]">
+                <p className="italic text-zinc-500 text-center text-[11px]">
                   By proceeding with this submission, I, the participant (or my parent/guardian if I am under 18 years of age) whose details are specified in the accompanying form, hereby voluntarily register for the tour organized by Ghumoo With Us and unconditionally agree to the following legally binding terms:
                 </p>
                 
                 <div className="space-y-3">
-                  <p className="font-bold text-slate-200 text-[11px]">1. Participant Code of Conduct & Discipline</p>
-                  <ul className="list-disc pl-5 space-y-1">
-                    <li><span className="font-semibold text-slate-200">Zero-Tolerance Policy:</span> The consumption, possession, or distribution of alcohol, cigarettes, e-cigarettes, vapes, drugs, or any illegal intoxicating substances is strictly prohibited throughout the entire duration of the tour (including transit and hotel stays).</li>
-                    <li><span className="font-semibold text-slate-200">Compliance:</span> I agree to strictly adhere to the itinerary timings, safety instructions, and decisions made by the assigned Tour Leader and organizers.</li>
-                    <li><span className="font-semibold text-slate-200">Expulsion without Refund:</span> Any instance of misbehavior, indiscipline, late reporting, or failure to follow instructions will result in immediate removal from the tour. In such cases, the company is not liable to provide any alternative transport, accommodation, or financial refund.</li>
+                  <p className="font-bold text-zinc-800 text-[11px]">1. Participant Code of Conduct & Discipline</p>
+                  <ul className="list-disc pl-5 space-y-1 text-zinc-600">
+                    <li><span className="font-semibold text-zinc-800">Zero-Tolerance Policy:</span> The consumption, possession, or distribution of alcohol, cigarettes, e-cigarettes, vapes, drugs, or any illegal intoxicating substances is strictly prohibited throughout the entire duration of the tour (including transit and hotel stays).</li>
+                    <li><span className="font-semibold text-zinc-800">Compliance:</span> I agree to strictly adhere to the itinerary timings, safety instructions, and decisions made by the assigned Tour Leader and organizers.</li>
+                    <li><span className="font-semibold text-zinc-800">Expulsion without Refund:</span> Any instance of misbehavior, indiscipline, late reporting, or failure to follow instructions will result in immediate removal from the tour. In such cases, the company is not liable to provide any alternative transport, accommodation, or financial refund.</li>
                   </ul>
                 </div>
 
                 <div className="space-y-3">
-                  <p className="font-bold text-slate-200 text-[11px]">2. Financial Liability & Property Damage</p>
-                  <ul className="list-disc pl-5 space-y-1">
-                    <li><span className="font-semibold text-slate-200">Property Damage:</span> I accept full financial responsibility for any damage caused by me to hotel rooms, vehicles, public property, or third-party equipment during the tour. All repair or replacement costs must be settled by me immediately on-site.</li>
-                    <li><span className="font-semibold text-slate-200">Personal Belongings:</span> Ghumoo With Us acts solely as a facilitator. The company, its employees, and coordinators accept zero liability for the loss, theft, or damage of personal belongings, including mobile phones, wallets, cameras, luggage, or cash.</li>
+                  <p className="font-bold text-zinc-800 text-[11px]">2. Financial Liability & Property Damage</p>
+                  <ul className="list-disc pl-5 space-y-1 text-zinc-600">
+                    <li><span className="font-semibold text-zinc-800">Property Damage:</span> I accept full financial responsibility for any damage caused by me to hotel rooms, vehicles, public property, or third-party equipment during the tour. All repair or replacement costs must be settled by me immediately on-site.</li>
+                    <li><span className="font-semibold text-zinc-800">Personal Belongings:</span> Ghumoo With Us acts solely as a facilitator. The company, its employees, and coordinators accept zero liability for the loss, theft, or damage of personal belongings, including mobile phones, wallets, cameras, luggage, or cash.</li>
                   </ul>
                 </div>
                 
                 {/* Bold Risk Clause */}
-                <div className="pl-3 border-l-2 border-rose-500 bg-rose-500/5 py-2 px-3 rounded-r-xl">
-                  <p className="font-bold text-rose-300 text-[11px] mb-1">3. Absolute Assumption of Risk & Indemnity</p>
-                  <ul className="list-disc pl-4 space-y-1 text-slate-300">
+                <div className="pl-3 border-l-2 border-rose-500 bg-rose-50/50 py-2 px-3 rounded-r-xl">
+                  <p className="font-bold text-rose-700 text-[11px] mb-1">3. Absolute Assumption of Risk & Indemnity</p>
+                  <ul className="list-disc pl-4 space-y-1 text-zinc-700">
                     <li><span className="font-bold">Inherent Risks:</span> I understand that travel, sightseeing, and adventure/wildlife activities involve inherent risks of delay, illness, personal injury, or unforeseen hazards.</li>
                     <li><span className="font-bold">Release of Liability:</span> I voluntarily assume all risks associated with my participation. I hereby release, acquit, and forever discharge Ghumoo With Us, its directors, partners, and field staff from any and all legal claims, liabilities, demands, or lawsuits arising out of any personal injury, severe bodily harm, illness, medical emergency, or accidental death during the tour.</li>
                   </ul>
                 </div>
 
                 <div className="space-y-3">
-                  <p className="font-bold text-slate-200 text-[11px]">4. Medical Fitness & Emergency Authorization</p>
-                  <ul className="list-disc pl-5 space-y-1">
+                  <p className="font-bold text-zinc-800 text-[11px]">4. Medical Fitness & Emergency Authorization</p>
+                  <ul className="list-disc pl-5 space-y-1 text-zinc-600">
                     <li>I certify that I am mentally and physically fit to undertake this travel itinerary. I have transparently disclosed any pre-existing medical conditions to the organizers prior to departure.</li>
                     <li>In the event of a medical emergency, I authorize the tour coordinators to arrange for local medical treatment, hospitalization, or first-aid at my sole financial expense.</li>
                   </ul>
                 </div>
                 
                 {/* Bold Force Majeure Clause */}
-                <div className="pl-3 border-l-2 border-rose-500 bg-rose-500/5 py-2 px-3 rounded-r-xl">
-                  <p className="font-bold text-rose-300 text-[11px] mb-1">5. Force Majeure & Third-Party Service Limitations</p>
-                  <ul className="list-disc pl-4 space-y-1 text-slate-300">
+                <div className="pl-3 border-l-2 border-rose-500 bg-rose-50/50 py-2 px-3 rounded-r-xl">
+                  <p className="font-bold text-rose-700 text-[11px] mb-1">5. Force Majeure & Third-Party Service Limitations</p>
+                  <ul className="list-disc pl-4 space-y-1 text-zinc-700">
                     <li>Ghumoo With Us relies on third-party vendors (hotels, transport operators, safari vehicles). The company is not liable for deficiencies in service, accidents, or delays caused by these independent vendors.</li>
-                    <li><span className="font-bold">Unseen Events:</span> The company is not liable for tour cancellations, changes in itinerary, or incomplete sightseeing caused by Force Majeure events—including but not limited to landslides, floods, extreme weather, political strikes (bandhs), riots, road blockades, or sudden government/forest department restrictions. No refunds or compensations will be issued under these circumstances.</li>
+                    <li><span className="font-bold">Unforeseen Events:</span> The company is not liable for tour cancellations, changes in itinerary, or incomplete sightseeing caused by Force Majeure events—including but not limited to landslides, floods, extreme weather, political strikes (bandhs), riots, road blockades, or sudden government/forest department restrictions. No refunds or compensations will be issued under these circumstances.</li>
                   </ul>
                 </div>
 
                 <div className="space-y-3">
-                  <p className="font-bold text-slate-200 text-[11px]">6. Refund and Cancellation Policy</p>
-                  <p className="pl-1">
+                  <p className="font-bold text-zinc-800 text-[11px]">6. Refund and Cancellation Policy</p>
+                  <p className="pl-1 text-zinc-600">
                     Once the tour has commenced, no refunds, partial or full, will be provided for unutilized services, voluntary dropouts, or disciplinary expulsions.
                   </p>
                 </div>
 
                 <div className="space-y-3">
-                  <p className="font-bold text-slate-200 text-[11px]">7. Media Content Release</p>
-                  <p className="pl-1">
+                  <p className="font-bold text-zinc-800 text-[11px]">7. Media Content Release</p>
+                  <p className="pl-1 text-zinc-600">
                     I hereby grant Ghumoo With Us the absolute right and permission to use any photographs, videos, or digital media captured of me during the tour for promotional, social media marketing, and internal record purposes without requiring further compensation or approval.
                   </p>
                 </div>
 
                 <div className="space-y-3">
-                  <p className="font-bold text-slate-200 text-[11px]">8. Governing Law and Legal Jurisdiction</p>
-                  <p className="pl-1">
+                  <p className="font-bold text-zinc-800 text-[11px]">8. Governing Law and Legal Jurisdiction</p>
+                  <p className="pl-1 text-zinc-600">
                     This agreement shall be governed by and construed in accordance with the laws of India. Any legal disputes, claims, or proceedings arising out of this contract shall be subject to the exclusive jurisdiction of the competent courts in Kolkata, West Bengal only.
                   </p>
                 </div>
                 
-                <div className="pt-4 border-t border-slate-800">
-                  <p className="font-bold text-slate-100 text-center">
+                <div className="pt-4 border-t border-zinc-200">
+                  <p className="font-bold text-zinc-900 text-center">
                     FINAL DECLARATION
                   </p>
-                  <p className="mt-1 font-bold text-slate-300 text-center text-[10px]">
+                  <p className="mt-1 font-bold text-zinc-650 text-center text-[10px]">
                     By providing my digital/uploaded signature below, I acknowledge that I have read this entire document carefully, understood its legal implications, and agree to be bound by all its terms voluntarily and under my own free will.
                   </p>
                 </div>
               </div>
 
               {/* Checkbox wrapper */}
-              <div className="mt-4 flex items-start gap-3 border-t border-slate-800/60 pt-3">
+              <div className="mt-4 flex items-start gap-3 border-t border-zinc-200 pt-3">
                 <div className="flex items-center h-5">
                   <input
                     id="waiverCheckbox"
@@ -942,12 +939,12 @@ function App() {
                     disabled={!scrolledToBottom}
                     checked={isWaiverRead}
                     onChange={(e) => setIsWaiverRead(e.target.checked)}
-                    className="w-5 h-5 rounded border-slate-700 text-rose-500 focus:ring-rose-500 bg-slate-950 focus:ring-2 cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed transition-all"
+                    className="w-5 h-5 rounded border-zinc-300 text-rose-600 focus:ring-rose-500 bg-white focus:ring-2 cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed transition-all"
                   />
                 </div>
-                <label htmlFor="waiverCheckbox" className="text-xs text-slate-300 select-none">
+                <label htmlFor="waiverCheckbox" className="text-xs text-zinc-700 select-none">
                   {!scrolledToBottom ? (
-                    <span className="text-amber-400 font-medium">
+                    <span className="text-amber-600 font-medium">
                       ⚠️ Please scroll to the bottom of the waiver to enable and agree to these terms.
                     </span>
                   ) : (
