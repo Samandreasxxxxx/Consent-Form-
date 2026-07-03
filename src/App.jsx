@@ -456,44 +456,7 @@ function App() {
           </p>
         </div>
 
-        {/* Developer Sandbox Panel */}
-        <div className="bg-zinc-50 border-b border-zinc-150 p-4 text-xs text-zinc-600">
-          <details className="cursor-pointer group">
-            <summary className="font-semibold text-rose-600 hover:text-rose-500 flex items-center gap-2 list-none select-none">
-              <Sparkles className="w-3.5 h-3.5" />
-              <span>Developer Panel: Configure EmailJS Keys (Click to expand)</span>
-            </summary>
-            <div className="mt-3 grid grid-cols-1 md:grid-cols-3 gap-3 pt-2">
-              <div>
-                <label className="block text-zinc-500 font-bold mb-1">Service ID</label>
-                <input 
-                  type="text" 
-                  value={serviceId} 
-                  onChange={(e) => setServiceId(e.target.value)}
-                  className="w-full bg-white border border-zinc-300 rounded px-2 py-1 text-zinc-900 focus:outline-none focus:ring-1 focus:ring-rose-500"
-                />
-              </div>
-              <div>
-                <label className="block text-zinc-500 font-bold mb-1">Template ID</label>
-                <input 
-                  type="text" 
-                  value={templateId} 
-                  onChange={(e) => setTemplateId(e.target.value)}
-                  className="w-full bg-white border border-zinc-300 rounded px-2 py-1 text-zinc-900 focus:outline-none focus:ring-1 focus:ring-rose-500"
-                />
-              </div>
-              <div>
-                <label className="block text-zinc-500 font-bold mb-1">Public Key</label>
-                <input 
-                  type="text" 
-                  value={publicKey} 
-                  onChange={(e) => setPublicKey(e.target.value)}
-                  className="w-full bg-white border border-zinc-300 rounded px-2 py-1 text-zinc-900 focus:outline-none focus:ring-1 focus:ring-rose-500"
-                />
-              </div>
-            </div>
-          </details>
-        </div>
+
 
         {/* Main Grid: Split Column Landscape Layout */}
         <form onSubmit={handleSubmit} className="p-6 md:p-8 lg:grid lg:grid-cols-12 lg:gap-8 space-y-8 lg:space-y-0">
