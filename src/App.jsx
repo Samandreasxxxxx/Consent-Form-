@@ -24,7 +24,7 @@ import {
 // EmailJS placeholders. Users can modify these to connect their account.
 const EMAILJS_SERVICE_ID = "YOUR_SERVICE_ID";
 const EMAILJS_TEMPLATE_ID = "YOUR_TEMPLATE_ID";
-const EMAILJS_PUBLIC_KEY = "YOUR_PUBLIC_KEY";
+const EMAILJS_PUBLIC_KEY = "UAbxHvr8CObbDeOgD";
 
 const TRIP_TYPES = [
   "Standard Sightseeing",
