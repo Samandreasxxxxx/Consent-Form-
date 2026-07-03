@@ -1,5 +1,5 @@
 import React, { useState, useRef, useEffect } from 'react';
-import { jsPDF } from 'jspdf';
+import SignatureCanvas from 'react-signature-canvas';
 import emailjs from 'emailjs-com';
 import { 
   FileText, 
@@ -24,7 +24,7 @@ import {
 // EmailJS placeholders. Users can modify these to connect their account.
 const EMAILJS_SERVICE_ID = "YOUR_SERVICE_ID";
 const EMAILJS_TEMPLATE_ID = "YOUR_TEMPLATE_ID";
-const EMAILJS_PUBLIC_KEY = "UAbxHvr8CObbDeOgD";
+const EMAILJS_PUBLIC_KEY = "UAbxHvr8CObbDeOgD"; // Hardcoded Public Key
 
 const TRIP_TYPES = [
   "Standard Sightseeing",
@@ -39,7 +39,6 @@ function App() {
     email: '',
     age: '',
     tripType: 'Standard Sightseeing',
-    tripDate: '',
     college: '',
     mobile: '',
     emergencyContactName: '',
@@ -47,9 +46,10 @@ function App() {
   });
 
   // UI & Processing States
+  const [signatureMethod, setSignatureMethod] = useState('draw'); // 'draw' | 'upload'
+  const [signatureImage, setSignatureImage] = useState(null); // transparent base64 PNG
   const [isWaiverRead, setIsWaiverRead] = useState(false);
-  const [signatureImage, setSignatureImage] = useState(null); // base64 PNG
-  const [isProcessingSignature, setIsProcessingSignature] = useState(false);
+  const [isProcessingUpload, setIsProcessingUpload] = useState(false);
   const [signatureWarning, setSignatureWarning] = useState('');
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [submitError, setSubmitError] = useState('');
@@ -66,6 +66,7 @@ function App() {
   const waiverRef = useRef(null);
   const fileInputRef = useRef(null);
   const canvasRef = useRef(null);
+  const sigPadRef = useRef(null);
 
   // Fetch client IP address on mount
   useEffect(() => {
@@ -97,12 +98,32 @@ function App() {
     }));
   };
 
-  // Image Processing & Brightness Validation
+  // 1. Drawing Pad Actions
+  const handleDrawEnd = () => {
+    if (sigPadRef.current) {
+      // Get the cropped/trimmed drawing from signature pad as base64 PNG
+      if (!sigPadRef.current.isEmpty()) {
+        const base64 = sigPadRef.current.getTrimmedCanvas().toDataURL('image/png');
+        setSignatureImage(base64);
+        setSignatureWarning('');
+      }
+    }
+  };
+
+  const handleClearDraw = () => {
+    if (sigPadRef.current) {
+      sigPadRef.current.clear();
+      setSignatureImage(null);
+      setSignatureWarning('');
+    }
+  };
+
+  // 2. Image Processing & Brightness Validation for Upload
   const handleSignatureUpload = (e) => {
     const file = e.target.files[0];
     if (!file) return;
 
-    setIsProcessingSignature(true);
+    setIsProcessingUpload(true);
     setSignatureWarning('');
 
     const reader = new FileReader();
@@ -112,7 +133,7 @@ function App() {
         const canvas = canvasRef.current;
         const ctx = canvas.getContext('2d');
 
-        // Scale image down if it is huge, keeping aspect ratio
+        // Scale image down to normalize sizes
         const maxDim = 400;
         let width = img.width;
         let height = img.height;
@@ -136,30 +157,27 @@ function App() {
         let totalBrightness = 0;
         const totalPixels = data.length / 4;
 
-        // Calculate average brightness first
         for (let i = 0; i < data.length; i += 4) {
           const r = data[i];
           const g = data[i + 1];
           const b = data[i + 2];
-          // Standard luma formula
           const luma = 0.299 * r + 0.587 * g + 0.114 * b;
           totalBrightness += luma;
         }
 
         const avgBrightness = totalBrightness / totalPixels;
 
-        // If overall image is too dark (average brightness below 120),
-        // it means there's not enough contrast (e.g., dark photo, poor lighting, or dark paper)
+        // Validation: If overall image is too dark (average brightness below 120),
+        // warning is triggered and submission disabled
         if (avgBrightness < 120) {
           setSignatureWarning('Please ensure your signature is clear and in dark ink on white paper.');
           setSignatureImage(null);
-          setIsProcessingSignature(false);
+          setIsProcessingUpload(false);
           return;
         }
 
-        // Loop through pixels and make background transparent
-        // Light pixels (brightness > 180) become transparent.
-        // Dark pixels (ink) are forced to a crisp solid dark charcoal/black for clarity.
+        // Processing: Light pixels (brightness > 180) become transparent.
+        // Dark pixels (ink) are forced to crisp charcoal/black.
         for (let i = 0; i < data.length; i += 4) {
           const r = data[i];
           const g = data[i + 1];
@@ -167,14 +185,11 @@ function App() {
           const luma = 0.299 * r + 0.587 * g + 0.114 * b;
 
           if (luma > 180) {
-            // Set alpha to 0 (make transparent)
-            data[i + 3] = 0;
+            data[i + 3] = 0; // Transparent
           } else {
-            // Force ink to deep charcoal/black
             data[i] = 20;     // R
             data[i + 1] = 20; // G
             data[i + 2] = 20; // B
-            // Keep original opacity or force fully opaque
             data[i + 3] = 255;
           }
         }
@@ -182,14 +197,14 @@ function App() {
         ctx.putImageData(imgData, 0, 0);
         const processedBase64 = canvas.toDataURL('image/png');
         setSignatureImage(processedBase64);
-        setIsProcessingSignature(false);
+        setIsProcessingUpload(false);
       };
       img.src = event.target.result;
     };
     reader.readAsDataURL(file);
   };
 
-  const handleClearSignature = () => {
+  const handleClearUpload = () => {
     setSignatureImage(null);
     setSignatureWarning('');
     if (fileInputRef.current) {
@@ -197,196 +212,29 @@ function App() {
     }
   };
 
-  // Compile PDF document using jsPDF
-  const generatePDF = async () => {
-    const doc = new jsPDF({
-      orientation: 'portrait',
-      unit: 'mm',
-      format: 'a4'
-    });
-
-    const pageWidth = doc.internal.pageSize.getWidth();
-    const margin = 20;
-    const contentWidth = pageWidth - (margin * 2);
-    let yPos = 20;
-
-    // Helper to print text and advance yPos
-    const printText = (text, size = 10, style = 'normal', color = [0, 0, 0], align = 'left') => {
-      doc.setFont('helvetica', style);
-      doc.setFontSize(size);
-      doc.setTextColor(color[0], color[1], color[2]);
-      
-      const lines = doc.splitTextToSize(text, contentWidth);
-      lines.forEach(line => {
-        if (yPos > doc.internal.pageSize.getHeight() - 25) {
-          doc.addPage();
-          yPos = 20;
-        }
-        if (align === 'center') {
-          doc.text(line, pageWidth / 2, yPos, { align: 'center' });
-        } else {
-          doc.text(line, margin, yPos);
-        }
-        yPos += (size * 0.4) + 2; // Line spacing based on size
-      });
-    };
-
-    // Header Title
-    printText('GHUMOO WITH US', 22, 'bold', [37, 99, 235], 'center');
-    yPos += 2;
-    printText('Digital Consent & Liability Waiver Form', 14, 'bold', [107, 114, 128], 'center');
-    yPos += 6;
-
-    // Draw horizontal separator line
-    doc.setDrawColor(229, 231, 235);
-    doc.setLineWidth(0.5);
-    doc.line(margin, yPos, pageWidth - margin, yPos);
-    yPos += 8;
-
-    // Customer & Trip Info Section
-    printText('1. TRIP & REGISTRANT INFORMATION', 12, 'bold', [37, 99, 235]);
-    yPos += 2;
-
-    const details = [
-      ['Full Legal Name:', formData.fullName],
-      ['Email Address:', formData.email],
-      ['Age:', `${formData.age} years`],
-      ['Trip Type:', formData.tripType],
-      ['Trip Date:', formData.tripDate],
-      ['College/Institution:', formData.college || 'N/A'],
-      ['Mobile Number:', formData.mobile],
-      ['Emergency Contact:', `${formData.emergencyContactName} (${formData.emergencyContactPhone})`]
-    ];
-
-    details.forEach(([label, val]) => {
-      doc.setFont('helvetica', 'bold');
-      doc.setFontSize(10);
-      doc.setTextColor(55, 65, 81);
-      doc.text(label, margin, yPos);
-      
-      doc.setFont('helvetica', 'normal');
-      doc.setTextColor(0, 0, 0);
-      doc.text(val, margin + 45, yPos);
-      
-      yPos += 6;
-    });
-    yPos += 4;
-
-    // Waiver Content
-    printText('2. TOUR TERMS, CONDITIONS, AND LIABILITY WAIVER', 12, 'bold', [37, 99, 235]);
-    yPos += 2;
-
-    const waiverIntroduction = 'By signing this document, I voluntarily register for the tour organized by Ghumoo With Us and explicitly agree to the following terms and conditions:';
-    printText(waiverIntroduction, 9.5, 'normal', [75, 85, 99]);
-    yPos += 2;
-
-    const clauses = [
-      '1. Student Code of Conduct: Zero tolerance for alcohol, smoking, or drugs. Any indiscipline leads to removal without refund.',
-      '2. Financial Liability: I accept full financial responsibility for any damage to property. The company is not liable for lost belongings.',
-      '3. Assumption of Risk & Indemnity: I understand travel involves inherent risks. I release Ghumoo With Us from liability for personal injury, illness, or death. (CRITICAL CLAUSE)',
-      '4. Medical Fitness: I confirm I am medically fit and authorize emergency medical treatment at my expense.',
-      '5. Force Majeure: The company is not liable for cancellations/delays due to weather, strikes, or forest department restrictions. No refunds will be issued. (CRITICAL CLAUSE)',
-      '6. Refund Policy: No refunds once the tour commences.',
-      '7. Jurisdiction: Disputes are subject to the exclusive jurisdiction of courts in Kolkata, West Bengal.',
-      'FINAL DECLARATION: By submitting, I agree to be bound by these terms voluntarily.'
-    ];
-
-    clauses.forEach(clause => {
-      // Bold clause 3 and 5 in the PDF as well to keep visual alignment
-      const isCritical = clause.includes('3. ') || clause.includes('5. ') || clause.includes('FINAL DECLARATION');
-      const fontSize = isCritical ? 9.5 : 9;
-      const fontStyle = isCritical ? 'bold' : 'normal';
-      const fontColor = isCritical ? [17, 24, 39] : [75, 85, 99];
-      
-      printText(clause, fontSize, fontStyle, fontColor);
-      yPos += 1;
-    });
-    yPos += 6;
-
-    // Signature Area
-    if (yPos > doc.internal.pageSize.getHeight() - 70) {
-      doc.addPage();
-      yPos = 25;
+  const handleTabChange = (tab) => {
+    setSignatureMethod(tab);
+    setSignatureImage(null);
+    setSignatureWarning('');
+    if (tab === 'draw' && sigPadRef.current) {
+      sigPadRef.current.clear();
     }
-
-    doc.setDrawColor(229, 231, 235);
-    doc.line(margin, yPos, pageWidth - margin, yPos);
-    yPos += 6;
-
-    printText('3. SIGNATURE & DIGITAL ATTESTATION', 12, 'bold', [37, 99, 235]);
-    yPos += 4;
-
-    // Stamping processed signature image
-    if (signatureImage) {
-      try {
-        // Draw a light grey bounding box for signature placement
-        doc.setFillColor(249, 250, 251);
-        doc.setDrawColor(229, 231, 235);
-        doc.rect(margin, yPos, 60, 25, 'FD');
-        
-        doc.addImage(signatureImage, 'PNG', margin + 5, yPos + 2, 50, 21);
-      } catch (err) {
-        console.error('Failed to embed signature image in PDF:', err);
-        printText('[Signature Image Render Error]', 9, 'italic', [220, 38, 38]);
-      }
+    if (tab === 'upload' && fileInputRef.current) {
+      fileInputRef.current.value = '';
     }
-    
-    doc.setFont('helvetica', 'normal');
-    doc.setFontSize(10);
-    doc.setTextColor(55, 65, 81);
-    doc.text('Authorized Digital Signatory', margin + 70, yPos + 10);
-    doc.setFont('helvetica', 'bold');
-    doc.text(formData.fullName, margin + 70, yPos + 16);
-
-    yPos += 30;
-
-    // Audit Trail Section
-    if (yPos > doc.internal.pageSize.getHeight() - 40) {
-      doc.addPage();
-      yPos = 25;
-    }
-
-    doc.setFillColor(243, 244, 246);
-    doc.rect(margin, yPos, contentWidth, 24, 'F');
-    
-    // Add border to block
-    doc.setDrawColor(209, 213, 219);
-    doc.rect(margin, yPos, contentWidth, 24, 'D');
-
-    yPos += 5;
-    doc.setFont('helvetica', 'bold');
-    doc.setFontSize(8.5);
-    doc.setTextColor(31, 41, 55);
-    doc.text('AUDIT TRAIL & SYSTEM METADATA', margin + 4, yPos);
-    
-    yPos += 4.5;
-    doc.setFont('helvetica', 'normal');
-    doc.setFontSize(7.5);
-    doc.setTextColor(75, 85, 99);
-    doc.text(`Timestamp: ${new Date().toLocaleString()}`, margin + 4, yPos);
-    
-    yPos += 3.5;
-    doc.text(`IP Address: ${ipAddress}`, margin + 4, yPos);
-    
-    yPos += 3.5;
-    const ua = navigator.userAgent;
-    const truncatedUA = ua.length > 95 ? ua.substring(0, 95) + '...' : ua;
-    doc.text(`User Agent: ${truncatedUA}`, margin + 4, yPos);
-
-    // Save as Base64 Data URI
-    return doc.output('datauristring');
   };
 
+  // Submit Waiver Flow
   const handleSubmit = async (e) => {
     e.preventDefault();
 
     if (!isWaiverRead) {
-      setSubmitError('Please read the liability waiver and tick the agreement checkbox.');
+      setSubmitError('Please read the liability waiver and check the agreement box.');
       return;
     }
 
     if (!signatureImage) {
-      setSubmitError('Please upload and validate a valid signature image.');
+      setSubmitError('Please sign on the signature pad or upload a valid signature image.');
       return;
     }
 
@@ -398,42 +246,39 @@ function App() {
     setIsSubmitting(true);
     setSubmitError('');
 
+    // Generate dates
+    const today = new Date();
+    const tripDateString = today.toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' });
+    const fullTimestampString = today.toLocaleString('en-US');
+
     try {
-      // 1. Generate PDF base64
-      const pdfBase64DataURI = await generatePDF();
-      
-      // 2. Prepare payload for EmailJS
-      // Send parameters containing the base64 string
+      // Prepare inline HTML EmailJS payload
       const templateParams = {
-        subject: `${formData.tripDate} - Waiver - ${formData.fullName} - ${formData.tripType}`,
+        subject: `${tripDateString} - Waiver - ${formData.fullName} - ${formData.tripType}`,
         customer_name: formData.fullName,
         customer_email: formData.email,
         trip_type: formData.tripType,
-        trip_date: formData.tripDate,
-        mobile_number: formData.mobile,
-        emergency_contact: `${formData.emergencyContactName} (${formData.emergencyContactPhone})`,
+        trip_date: tripDateString, // generated date
+        signature_image: signatureImage, // base64 transparent signature
+        timestamp: fullTimestampString,
         ip_address: ipAddress,
-        timestamp: new Date().toLocaleString(),
-        user_agent: navigator.userAgent,
-        pdf_attachment: pdfBase64DataURI // Pass PDF Base64 string directly
+        user_agent: navigator.userAgent
       };
 
-      // 3. Dispatch using EmailJS
       if (serviceId === "YOUR_SERVICE_ID" || templateId === "YOUR_TEMPLATE_ID" || publicKey === "YOUR_PUBLIC_KEY") {
-        console.log("EmailJS keys are placeholders. Simulating submission success in development mode...");
+        console.log("EmailJS keys are placeholder strings. Simulating submission in development...");
         console.log("Subject:", templateParams.subject);
-        console.log("Template Params:", templateParams);
+        console.log("Payload:", templateParams);
         
-        // Simulating network lag
-        await new Promise(resolve => setTimeout(resolve, 2000));
+        await new Promise(resolve => setTimeout(resolve, 1500));
       } else {
         await emailjs.send(serviceId, templateId, templateParams, publicKey);
       }
 
       setIsSubmitted(true);
     } catch (err) {
-      console.error('Email dispatch error:', err);
-      setSubmitError(err.text || err.message || 'An error occurred while compiling or sending the waiver. Please try again.');
+      console.error('EmailJS error:', err);
+      setSubmitError(err.text || err.message || 'An error occurred while sending your waiver. Please try again.');
     } finally {
       setIsSubmitting(false);
     }
@@ -444,7 +289,6 @@ function App() {
     return (
       <div className="min-h-screen bg-slate-900 flex items-center justify-center p-4 antialiased">
         <div className="w-full max-w-lg bg-slate-800/80 backdrop-blur-xl border border-slate-700/50 rounded-3xl p-8 text-center shadow-2xl relative overflow-hidden">
-          {/* Decorative gradients */}
           <div className="absolute -top-12 -left-12 w-32 h-32 bg-blue-500/20 rounded-full blur-2xl"></div>
           <div className="absolute -bottom-12 -right-12 w-32 h-32 bg-emerald-500/20 rounded-full blur-2xl"></div>
 
@@ -453,30 +297,30 @@ function App() {
             <div className="absolute inset-0 rounded-full border-2 border-emerald-400/20 animate-ping"></div>
           </div>
 
-          <h2 className="text-3xl font-extrabold text-white mb-3">Waiver Signed!</h2>
+          <h2 className="text-3xl font-extrabold text-white mb-3">Waiver Submitted!</h2>
           <p className="text-slate-300 mb-6 text-sm md:text-base leading-relaxed">
-            Thank you, <span className="font-semibold text-blue-400">{formData.fullName}</span>! Your waiver has been securely signed, timestamped, and submitted.
+            Thank you, <span className="font-semibold text-blue-400">{formData.fullName}</span>! Your waiver has been securely signed and submitted.
           </p>
 
           <div className="bg-slate-900/60 rounded-2xl p-5 mb-8 text-left border border-slate-700/30 space-y-3.5 text-xs text-slate-400">
             <div className="flex justify-between items-center border-b border-slate-800 pb-2">
-              <span>Trip Name:</span>
+              <span>Trip Category:</span>
               <span className="font-semibold text-white">{formData.tripType}</span>
             </div>
             <div className="flex justify-between items-center border-b border-slate-800 pb-2">
-              <span>Trip Date:</span>
-              <span className="font-semibold text-white">{formData.tripDate}</span>
+              <span>Submission Date:</span>
+              <span className="font-semibold text-white">{new Date().toLocaleDateString()}</span>
             </div>
             <div className="flex justify-between items-center border-b border-slate-800 pb-2">
               <span>Registered Email:</span>
               <span className="font-semibold text-white">{formData.email}</span>
             </div>
             <div className="flex justify-between items-center border-b border-slate-800 pb-2">
-              <span>IP Timestamp:</span>
+              <span>System IP:</span>
               <span className="font-semibold text-white">{ipAddress}</span>
             </div>
             <div className="flex justify-between items-center">
-              <span>Status:</span>
+              <span>Delivery Status:</span>
               <span className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-[10px] font-bold bg-emerald-500/10 text-emerald-400 border border-emerald-500/20">
                 <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse"></span>
                 Securely Dispatched
@@ -485,7 +329,7 @@ function App() {
           </div>
 
           <p className="text-slate-400 text-xs mb-6">
-            A confirmation receipt copy with the completed PDF has been sent to your email address.
+            A confirmation receipt copy with your inline details and signature has been sent to your email address.
           </p>
 
           <button
@@ -496,7 +340,6 @@ function App() {
                 email: '',
                 age: '',
                 tripType: 'Standard Sightseeing',
-                tripDate: '',
                 college: '',
                 mobile: '',
                 emergencyContactName: '',
@@ -523,7 +366,7 @@ function App() {
       {/* Main Container */}
       <div className="w-full max-w-4xl bg-slate-800/60 backdrop-blur-xl border border-slate-700/50 shadow-2xl rounded-3xl overflow-hidden relative">
         
-        {/* Subtle glow assets */}
+        {/* Glow gradients */}
         <div className="absolute top-0 right-0 w-80 h-80 bg-blue-500/10 rounded-full blur-3xl -z-10 pointer-events-none"></div>
         <div className="absolute bottom-0 left-0 w-80 h-80 bg-purple-500/10 rounded-full blur-3xl -z-10 pointer-events-none"></div>
 
@@ -532,9 +375,8 @@ function App() {
           <img 
             src="/logo.png" 
             alt="Ghumoo With Us" 
-            className="mx-auto w-32 md:w-36 h-auto object-contain rounded-full shadow-lg border-2 border-slate-600/40 p-1 mb-4 hover:scale-105 transition-transform duration-300"
+            className="mx-auto w-32 md:w-36 h-auto object-contain rounded-full shadow-lg border-2 border-slate-600/40 p-1 mb-4 hover:scale-105 transition-transform duration-300 animate-fade-in"
             onError={(e) => {
-              // Fallback if logo png is not found/loaded
               e.target.style.display = 'none';
             }}
           />
@@ -546,7 +388,7 @@ function App() {
           </p>
         </div>
 
-        {/* Developer Sandbox Panel: Helps test EmailJS setup */}
+        {/* Developer Sandbox Panel */}
         <div className="bg-slate-900/60 border-b border-slate-700/40 p-4 text-xs">
           <details className="cursor-pointer group">
             <summary className="font-semibold text-blue-400 hover:text-blue-300 flex items-center gap-2 list-none select-none">
@@ -583,8 +425,8 @@ function App() {
               </div>
             </div>
             {serviceId === "YOUR_SERVICE_ID" && (
-              <p className="mt-2 text-amber-400 font-medium">
-                * Currently using simulated email dispatcher. Supply actual keys above to trigger live EmailJS integration.
+              <p className="mt-2 text-amber-400 font-medium animate-pulse">
+                * Simulated mode is active. Fill in your service and template IDs above to trigger real dispatch.
               </p>
             )}
           </details>
@@ -596,47 +438,28 @@ function App() {
           <div>
             <div className="flex items-center gap-2 border-b border-slate-700 pb-2 mb-4">
               <MapPin className="w-5 h-5 text-blue-500" />
-              <h2 className="text-lg md:text-xl font-bold text-white">1. Select Trip Details</h2>
+              <h2 className="text-lg md:text-xl font-bold text-white">1. Select Trip Category</h2>
             </div>
             
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-              <div>
-                <label htmlFor="tripType" className="block text-sm font-semibold text-slate-300 mb-2">
-                  Trip Type *
-                </label>
-                <div className="relative">
-                  <select
-                    id="tripType"
-                    name="tripType"
-                    value={formData.tripType}
-                    onChange={handleInputChange}
-                    className="w-full bg-slate-900/80 border border-slate-700 rounded-xl px-4 py-3 text-slate-100 font-medium focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200 appearance-none"
-                    required
-                  >
-                    {TRIP_TYPES.map(t => (
-                      <option key={t} value={t}>{t}</option>
-                    ))}
-                  </select>
-                  <div className="absolute inset-y-0 right-0 flex items-center px-4 pointer-events-none text-slate-400">
-                    ▼
-                  </div>
-                </div>
-              </div>
-
-              <div>
-                <label htmlFor="tripDate" className="block text-sm font-semibold text-slate-300 mb-2">
-                  Trip Date *
-                </label>
-                <div className="relative">
-                  <input
-                    type="date"
-                    id="tripDate"
-                    name="tripDate"
-                    value={formData.tripDate}
-                    onChange={handleInputChange}
-                    className="w-full bg-slate-900/80 border border-slate-700 rounded-xl px-4 py-3 text-slate-100 font-medium focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200 [color-scheme:dark]"
-                    required
-                  />
+            <div>
+              <label htmlFor="tripType" className="block text-sm font-semibold text-slate-300 mb-2">
+                Trip Type *
+              </label>
+              <div className="relative">
+                <select
+                  id="tripType"
+                  name="tripType"
+                  value={formData.tripType}
+                  onChange={handleInputChange}
+                  className="w-full bg-slate-900/80 border border-slate-700 rounded-xl px-4 py-3 text-slate-100 font-medium focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200 appearance-none"
+                  required
+                >
+                  {TRIP_TYPES.map(t => (
+                    <option key={t} value={t}>{t}</option>
+                  ))}
+                </select>
+                <div className="absolute inset-y-0 right-0 flex items-center px-4 pointer-events-none text-slate-400">
+                  ▼
                 </div>
               </div>
             </div>
@@ -673,7 +496,7 @@ function App() {
 
               <div>
                 <label htmlFor="email" className="block text-sm font-semibold text-slate-300 mb-2">
-                  Email Address (Receipt recipient) *
+                  Email Address *
                 </label>
                 <div className="relative">
                   <span className="absolute inset-y-0 left-0 pl-3.5 flex items-center text-slate-500 pointer-events-none">
@@ -712,7 +535,7 @@ function App() {
 
               <div>
                 <label htmlFor="college" className="block text-sm font-semibold text-slate-300 mb-2">
-                  College / Institution (Optional)
+                  College / Institution
                 </label>
                 <div className="relative">
                   <span className="absolute inset-y-0 left-0 pl-3.5 flex items-center text-slate-500 pointer-events-none">
@@ -754,7 +577,7 @@ function App() {
               <div className="grid grid-cols-2 gap-4">
                 <div>
                   <label htmlFor="emergencyContactName" className="block text-sm font-semibold text-slate-300 mb-2">
-                    Emergency Name *
+                    Emergency Contact Name *
                   </label>
                   <input
                     type="text"
@@ -802,49 +625,84 @@ function App() {
               onScroll={handleWaiverScroll}
               className="h-64 overflow-y-auto border border-slate-700 rounded-2xl p-5 bg-slate-900/60 custom-scrollbar space-y-4 text-xs md:text-sm text-slate-300 leading-relaxed"
             >
-              <h3 className="text-center font-bold text-slate-100 border-b border-slate-800 pb-3 text-sm tracking-wide">
+              <h3 className="text-center font-extrabold text-slate-100 border-b border-slate-800 pb-3 text-sm tracking-wide">
                 TOUR TERMS, CONDITIONS, AND LIABILITY WAIVER
               </h3>
               
-              <p>By proceeding, I voluntarily register for the tour organized by Ghumoo With Us.</p>
-              
-              <p className="pl-1">
-                <span className="font-semibold text-slate-200">1. Student Code of Conduct:</span> Zero tolerance for alcohol, smoking, or drugs. Any indiscipline leads to removal without refund.
+              <p className="italic text-slate-400 text-center">
+                By proceeding with this submission, I, the participant whose details are specified in the accompanying form, hereby voluntarily register for the tour organized by Ghumoo With Us and unconditionally agree to the following legally binding terms:
               </p>
               
-              <p className="pl-1">
-                <span className="font-semibold text-slate-200">2. Financial Liability:</span> I accept full financial responsibility for any damage to property. The company is not liable for lost belongings.
-              </p>
+              <div className="space-y-3">
+                <p className="font-bold text-slate-200 text-sm">1. Student Code of Conduct & Discipline</p>
+                <ul className="list-disc pl-5 space-y-1">
+                  <li><span className="font-semibold text-slate-200">Zero-Tolerance Policy:</span> The consumption, possession, or distribution of alcohol, cigarettes, e-cigarettes, vapes, drugs, or any illegal intoxicating substances is strictly prohibited throughout the entire duration of the tour (including transit and hotel stays).</li>
+                  <li><span className="font-semibold text-slate-200">Compliance:</span> I agree to strictly adhere to the itinerary timings, safety instructions, and decisions made by the assigned Tour Leader and organizers.</li>
+                  <li><span className="font-semibold text-slate-200">Expulsion without Refund:</span> Any instance of misbehavior, indiscipline, late reporting, or failure to follow instructions will result in immediate removal from the tour. In such cases, the company is not liable to provide any alternative transport, accommodation, or financial refund.</li>
+                </ul>
+              </div>
+
+              <div className="space-y-3">
+                <p className="font-bold text-slate-200 text-sm">2. Financial Liability & Property Damage</p>
+                <ul className="list-disc pl-5 space-y-1">
+                  <li><span className="font-semibold text-slate-200">Property Damage:</span> I accept full financial responsibility for any damage caused by me to hotel rooms, vehicles, public property, or third-party equipment during the tour. All repair or replacement costs must be settled by me immediately on-site.</li>
+                  <li><span className="font-semibold text-slate-200">Personal Belongings:</span> Ghumoo With Us acts solely as a facilitator. The company, its employees, and coordinators accept zero liability for the loss, theft, or damage of personal belongings, including mobile phones, wallets, cameras, luggage, or cash.</li>
+                </ul>
+              </div>
               
               {/* Bold Risk Clause */}
-              <div className="pl-2 border-l-2 border-amber-500/80 bg-amber-500/5 py-2 px-3 rounded-r-xl">
-                <p className="font-bold text-amber-200">
-                  3. Assumption of Risk & Indemnity: I understand travel involves inherent risks. I release Ghumoo With Us from liability for personal injury, illness, or death.
-                </p>
+              <div className="pl-3 border-l-2 border-amber-500 bg-amber-500/5 py-2 px-3 rounded-r-xl">
+                <p className="font-bold text-amber-200 text-sm mb-1">3. Absolute Assumption of Risk & Indemnity</p>
+                <ul className="list-disc pl-4 space-y-1 text-amber-100/90">
+                  <li><span className="font-bold">Inherent Risks:</span> I understand that travel, sightseeing, and adventure/wildlife activities involve inherent risks of delay, illness, personal injury, or unforeseen hazards.</li>
+                  <li><span className="font-bold">Release of Liability:</span> I voluntarily assume all risks associated with my participation. I hereby release, acquit, and forever discharge Ghumoo With Us, its directors, partners, and field staff from any and all legal claims, liabilities, demands, or lawsuits arising out of any personal injury, severe bodily harm, illness, medical emergency, or accidental death during the tour.</li>
+                </ul>
               </div>
-              
-              <p className="pl-1">
-                <span className="font-semibold text-slate-200">4. Medical Fitness:</span> I confirm I am medically fit and authorize emergency medical treatment at my expense.
-              </p>
+
+              <div className="space-y-3">
+                <p className="font-bold text-slate-200 text-sm">4. Medical Fitness & Emergency Authorization</p>
+                <ul className="list-disc pl-5 space-y-1">
+                  <li>I certify that I am mentally and physically fit to undertake this travel itinerary. I have transparently disclosed any pre-existing medical conditions to the organizers prior to departure.</li>
+                  <li>In the event of a medical emergency, I authorize the tour coordinators to arrange for local medical treatment, hospitalization, or first-aid at my sole financial expense.</li>
+                </ul>
+              </div>
               
               {/* Bold Force Majeure Clause */}
-              <div className="pl-2 border-l-2 border-amber-500/80 bg-amber-500/5 py-2 px-3 rounded-r-xl">
-                <p className="font-bold text-amber-200">
-                  5. Force Majeure: The company is not liable for cancellations/delays due to weather, strikes, or forest department restrictions. No refunds will be issued.
+              <div className="pl-3 border-l-2 border-amber-500 bg-amber-500/5 py-2 px-3 rounded-r-xl">
+                <p className="font-bold text-amber-200 text-sm mb-1">5. Force Majeure & Third-Party Service Limitations</p>
+                <ul className="list-disc pl-4 space-y-1 text-amber-100/90">
+                  <li>Ghumoo With Us relies on third-party vendors (hotels, transport operators, safari vehicles). The company is not liable for deficiencies in service, accidents, or delays caused by these independent vendors.</li>
+                  <li><span className="font-bold">Unforeseen Events:</span> The company is not liable for tour cancellations, changes in itinerary, or incomplete sightseeing caused by Force Majeure events—including but not limited to landslides, floods, extreme weather, political strikes (bandhs), riots, road blockades, or sudden government/forest department restrictions. No refunds or compensations will be issued under these circumstances.</li>
+                </ul>
+              </div>
+
+              <div className="space-y-3">
+                <p className="font-bold text-slate-200 text-sm">6. Refund and Cancellation Policy</p>
+                <p className="pl-1">
+                  Once the tour has commenced, no refunds, partial or full, will be provided for unutilized services, voluntary dropouts, or disciplinary expulsions.
+                </p>
+              </div>
+
+              <div className="space-y-3">
+                <p className="font-bold text-slate-200 text-sm">7. Media Content Release</p>
+                <p className="pl-1">
+                  I hereby grant Ghumoo With Us the absolute right and permission to use any photographs, videos, or digital media captured of me during the tour for promotional, social media marketing, and internal record purposes without requiring further compensation or approval.
+                </p>
+              </div>
+
+              <div className="space-y-3">
+                <p className="font-bold text-slate-200 text-sm">8. Governing Law and Legal Jurisdiction</p>
+                <p className="pl-1">
+                  This agreement shall be governed by and construed in accordance with the laws of India. Any legal disputes, claims, or proceedings arising out of this contract shall be subject to the exclusive jurisdiction of the competent courts in Kolkata, West Bengal only.
                 </p>
               </div>
               
-              <p className="pl-1">
-                <span className="font-semibold text-slate-200">6. Refund Policy:</span> No refunds once the tour commences.
-              </p>
-              
-              <p className="pl-1">
-                <span className="font-semibold text-slate-200">7. Jurisdiction:</span> Disputes are subject to the exclusive jurisdiction of courts in Kolkata, West Bengal.
-              </p>
-              
-              <div className="pt-3 border-t border-slate-800">
+              <div className="pt-4 border-t border-slate-800">
                 <p className="font-bold text-slate-100 text-center">
-                  FINAL DECLARATION: By submitting, I agree to be bound by these terms voluntarily.
+                  FINAL DECLARATION
+                </p>
+                <p className="mt-1 font-bold text-slate-300 text-center text-xs">
+                  By providing my digital/uploaded signature below, I acknowledge that I have read this entire document carefully, understood its legal implications, and agree to be bound by all its terms voluntarily and under my own free will.
                 </p>
               </div>
             </div>
@@ -873,89 +731,143 @@ function App() {
             </div>
           </div>
 
-          {/* Section 4: Signature Upload */}
+          {/* Section 4: Dual Signature Component */}
           <div>
             <div className="flex items-center gap-2 border-b border-slate-700 pb-2 mb-4">
               <PenTool className="w-5 h-5 text-blue-500" />
-              <h2 className="text-lg md:text-xl font-bold text-white">4. Upload Ink Signature</h2>
+              <h2 className="text-lg md:text-xl font-bold text-white">4. Provide Signature</h2>
             </div>
             
             <p className="text-xs text-slate-400 mb-4">
-              Provide a clear image of your signature. Make sure it is written in <strong>dark ink on plain white paper</strong>, under clear lighting.
+              Choose your preferred method below to provide a transparent signature.
             </p>
 
+            {/* Method Tabs */}
+            <div className="flex border-b border-slate-700/60 mb-6 max-w-sm">
+              <button
+                type="button"
+                onClick={() => handleTabChange('draw')}
+                className={`flex-1 pb-3 text-sm font-semibold border-b-2 text-center transition-all duration-200 ${
+                  signatureMethod === 'draw' 
+                    ? 'border-blue-500 text-blue-400' 
+                    : 'border-transparent text-slate-400 hover:text-slate-200'
+                }`}
+              >
+                ✏️ Draw Signature
+              </button>
+              <button
+                type="button"
+                onClick={() => handleTabChange('upload')}
+                className={`flex-1 pb-3 text-sm font-semibold border-b-2 text-center transition-all duration-200 ${
+                  signatureMethod === 'upload' 
+                    ? 'border-blue-500 text-blue-400' 
+                    : 'border-transparent text-slate-400 hover:text-slate-200'
+                }`}
+              >
+                📂 Upload Image
+              </button>
+            </div>
+
+            {/* Signature Area Grid */}
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6 items-center">
               
-              {/* File upload trigger block */}
-              <div>
-                <input
-                  type="file"
-                  id="signatureFile"
-                  accept="image/*"
-                  ref={fileInputRef}
-                  onChange={handleSignatureUpload}
-                  className="hidden"
-                />
-                
-                <button
-                  type="button"
-                  onClick={() => fileInputRef.current?.click()}
-                  className="w-full flex flex-col items-center justify-center border-2 border-dashed border-slate-700 hover:border-blue-500 hover:bg-slate-800/40 rounded-2xl p-6 transition-all duration-200 cursor-pointer text-center group"
-                >
-                  <div className="w-12 h-12 bg-slate-900/80 rounded-full flex items-center justify-center text-slate-400 group-hover:text-blue-400 mb-3 border border-slate-700 transition-colors">
-                    {isProcessingSignature ? (
-                      <Loader2 className="w-6 h-6 animate-spin text-blue-500" />
-                    ) : (
-                      <Upload className="w-6 h-6" />
-                    )}
+              {/* Tab 1: Draw Signature Pad */}
+              {signatureMethod === 'draw' && (
+                <div>
+                  <div className="border border-slate-700 rounded-2xl overflow-hidden bg-white p-1">
+                    <SignatureCanvas 
+                      ref={sigPadRef}
+                      penColor="black"
+                      onEnd={handleDrawEnd}
+                      canvasProps={{
+                        className: "w-full h-44 cursor-crosshair rounded-xl"
+                      }}
+                    />
                   </div>
-                  <span className="block text-sm font-semibold text-slate-200">
-                    {isProcessingSignature ? 'Processing Signature...' : 'Select Signature Image'}
-                  </span>
-                  <span className="block text-xs text-slate-500 mt-1">
-                    PNG, JPG, or WEBP (Max 10MB)
-                  </span>
-                </button>
+                  <button
+                    type="button"
+                    onClick={handleClearDraw}
+                    className="mt-3 bg-slate-800 hover:bg-slate-700 text-slate-300 font-semibold px-4 py-2 rounded-xl text-xs border border-slate-700 flex items-center gap-1.5 shadow transition-colors"
+                  >
+                    <RefreshCw className="w-3 h-3" />
+                    Clear Signature Pad
+                  </button>
+                </div>
+              )}
 
-                {signatureWarning && (
-                  <div className="mt-4 flex items-start gap-2.5 bg-red-950/40 border border-red-900/60 rounded-xl p-3 text-red-300 text-xs">
-                    <AlertCircle className="w-4 h-4 shrink-0 text-red-400 mt-0.5" />
-                    <div>
-                      <p className="font-semibold text-red-200">Contrast Validation Failed</p>
-                      <p className="mt-0.5">{signatureWarning}</p>
+              {/* Tab 2: Upload File Panel */}
+              {signatureMethod === 'upload' && (
+                <div>
+                  <input
+                    type="file"
+                    id="signatureFile"
+                    accept="image/*"
+                    ref={fileInputRef}
+                    onChange={handleSignatureUpload}
+                    className="hidden"
+                  />
+                  
+                  <button
+                    type="button"
+                    onClick={() => fileInputRef.current?.click()}
+                    className="w-full flex flex-col items-center justify-center border-2 border-dashed border-slate-700 hover:border-blue-500 hover:bg-slate-800/40 rounded-2xl p-6 transition-all duration-200 cursor-pointer text-center group"
+                  >
+                    <div className="w-12 h-12 bg-slate-900/80 rounded-full flex items-center justify-center text-slate-400 group-hover:text-blue-400 mb-3 border border-slate-700 transition-colors">
+                      {isProcessingUpload ? (
+                        <Loader2 className="w-6 h-6 animate-spin text-blue-500" />
+                      ) : (
+                        <Upload className="w-6 h-6" />
+                      )}
                     </div>
-                  </div>
-                )}
-              </div>
+                    <span className="block text-sm font-semibold text-slate-200">
+                      {isProcessingUpload ? 'Processing Signature...' : 'Select Signature Photo'}
+                    </span>
+                    <span className="block text-xs text-slate-500 mt-1">
+                      (Dark ink on blank white paper)
+                    </span>
+                  </button>
 
-              {/* Signature Preview Block */}
+                  {signatureWarning && (
+                    <div className="mt-4 flex items-start gap-2.5 bg-red-950/40 border border-red-900/60 rounded-xl p-3 text-red-300 text-xs">
+                      <AlertCircle className="w-4 h-4 shrink-0 text-red-400 mt-0.5" />
+                      <div>
+                        <p className="font-semibold text-red-200">Contrast Validation Failed</p>
+                        <p className="mt-0.5">{signatureWarning}</p>
+                      </div>
+                    </div>
+                  )}
+                </div>
+              )}
+
+              {/* Universal Signature Preview Frame */}
               <div className="flex flex-col items-center">
                 <span className="text-xs font-semibold text-slate-400 mb-2">
-                  Processed Signature (Transparent Background Check)
+                  Processed Signature (Transparent Preview)
                 </span>
                 
-                <div className="w-full h-32 rounded-2xl border border-slate-700 transparency-grid flex items-center justify-center overflow-hidden relative bg-slate-900/80 p-2 shadow-inner">
+                <div className="w-full h-44 rounded-2xl border border-slate-700 transparency-grid flex items-center justify-center overflow-hidden relative bg-slate-900/80 p-2 shadow-inner">
                   {signatureImage ? (
                     <>
                       <img 
                         src={signatureImage} 
-                        alt="Processed transparent ink signature preview" 
+                        alt="Signature transparency rendering" 
                         className="max-h-full max-w-full object-contain filter drop-shadow-sm select-none"
                       />
-                      
-                      <button
-                        type="button"
-                        onClick={handleClearSignature}
-                        className="absolute bottom-2 right-2 bg-slate-800 hover:bg-slate-700 text-slate-300 font-semibold px-2.5 py-1 rounded-lg text-[10px] border border-slate-700 flex items-center gap-1 shadow transition-colors"
-                      >
-                        <RefreshCw className="w-2.5 h-2.5" />
-                        Clear
-                      </button>
+                      {signatureMethod === 'upload' && (
+                        <button
+                          type="button"
+                          onClick={handleClearUpload}
+                          className="absolute bottom-2 right-2 bg-slate-800 hover:bg-slate-700 text-slate-300 font-semibold px-2.5 py-1 rounded-lg text-[10px] border border-slate-700 flex items-center gap-1 shadow transition-colors"
+                        >
+                          <RefreshCw className="w-2.5 h-2.5" />
+                          Clear Image
+                        </button>
+                      )}
                     </>
                   ) : (
                     <div className="text-slate-600 text-xs flex flex-col items-center gap-1.5">
                       <PenTool className="w-5 h-5 text-slate-700" />
-                      <span>Preview will render here</span>
+                      <span>{signatureMethod === 'draw' ? 'Draw on the pad to see preview' : 'Upload image to see preview'}</span>
                     </div>
                   )}
                 </div>
@@ -971,12 +883,12 @@ function App() {
             </span>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-1.5 md:gap-4">
               <div>
-                <span className="font-semibold text-slate-500">System IP address: </span>
+                <span className="font-semibold text-slate-500">System IP Address: </span>
                 <span className="text-slate-300">{ipAddress}</span>
               </div>
               <div>
                 <span className="font-semibold text-slate-500">Document Timestamp: </span>
-                <span className="text-slate-300">{new Date().toLocaleDateString()} {new Date().toLocaleTimeString()}</span>
+                <span className="text-slate-300">{new Date().toLocaleString()}</span>
               </div>
             </div>
             <div className="pt-1.5 border-t border-slate-800">
@@ -1005,7 +917,7 @@ function App() {
               {isSubmitting ? (
                 <>
                   <Loader2 className="w-5 h-5 animate-spin" />
-                  Generating PDF & Dispatched to EmailJS...
+                  Submitting waiver details...
                 </>
               ) : (
                 <>
