@@ -116,6 +116,40 @@ function App() {
     }));
   };
 
+  // Dynamic signature pad resizing for retina display crispness & alignment
+  const resizeCanvas = () => {
+    if (sigPadRef.current) {
+      const canvas = sigPadRef.current.getCanvas();
+      if (canvas) {
+        const ratio = Math.max(window.devicePixelRatio || 1, 1);
+        const targetWidth = canvas.offsetWidth;
+        const targetHeight = canvas.offsetHeight;
+        
+        if (canvas.width !== targetWidth * ratio || canvas.height !== targetHeight * ratio) {
+          const data = sigPadRef.current.toData();
+          canvas.width = targetWidth * ratio;
+          canvas.height = targetHeight * ratio;
+          const ctx = canvas.getContext("2d");
+          if (ctx) ctx.scale(ratio, ratio);
+          sigPadRef.current.clear();
+          sigPadRef.current.fromData(data);
+        }
+      }
+    }
+  };
+
+  // Run signature resize checks on mount and method toggle
+  useEffect(() => {
+    if (signatureMethod === 'draw') {
+      const timer = setTimeout(resizeCanvas, 400);
+      window.addEventListener('resize', resizeCanvas);
+      return () => {
+        clearTimeout(timer);
+        window.removeEventListener('resize', resizeCanvas);
+      };
+    }
+  }, [signatureMethod]);
+
   // 1. Drawing Pad Actions
   const handleDrawEnd = () => {
     if (sigPadRef.current) {
@@ -711,9 +745,7 @@ function App() {
                         penColor="black"
                         onEnd={handleDrawEnd}
                         canvasProps={{
-                          className: "w-full h-32 cursor-crosshair rounded-xl",
-                          width: 500,
-                          height: 124
+                          className: "w-full h-32 cursor-crosshair rounded-xl"
                         }}
                       />
                       <button
