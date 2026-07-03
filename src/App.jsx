@@ -690,10 +690,10 @@ function App() {
                 </button>
               </div>
 
-              {/* Signature Area Grid */}
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4 items-start">
+              {/* Signature Area */}
+              <div>
                 
-                {/* Tab 1: Draw Signature Pad */}
+                {/* Tab 1: Draw Signature Pad (Full Width, No Preview) */}
                 {signatureMethod === 'draw' && (
                   <div className="flex flex-col">
                     <span className="text-[10px] font-bold text-zinc-450 mb-1 text-center block">
@@ -720,88 +720,89 @@ function App() {
                   </div>
                 )}
 
-                {/* Tab 2: Upload File Panel */}
+                {/* Tab 2: Upload File Panel & Preview (Symmetric Grid Layout) */}
                 {signatureMethod === 'upload' && (
-                  <div className="flex flex-col">
-                    <span className="text-[10px] font-bold text-zinc-450 mb-1 text-center block">
-                      Signature Upload (Select photo)
-                    </span>
-                    <div className="relative w-full h-32">
-                      <input
-                        type="file"
-                        id="signatureFile"
-                        accept="image/*"
-                        ref={fileInputRef}
-                        onChange={handleSignatureUpload}
-                        className="hidden"
-                      />
-                      
-                      <button
-                        type="button"
-                        onClick={() => fileInputRef.current?.click()}
-                        className="w-full h-full flex flex-col items-center justify-center border border-zinc-200 hover:border-rose-500 hover:bg-rose-50/20 rounded-2xl transition-all duration-200 cursor-pointer text-center group bg-zinc-50 shadow-sm"
-                      >
-                        <div className="w-8 h-8 bg-white rounded-full flex items-center justify-center text-zinc-400 group-hover:text-rose-500 mb-1 border border-zinc-200 transition-colors shadow-sm">
-                          {isProcessingUpload ? (
-                            <Loader2 className="w-4 h-4 animate-spin text-rose-500" />
-                          ) : (
-                            <Upload className="w-4 h-4" />
-                          )}
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4 items-start">
+                    {/* Left Column: Upload */}
+                    <div className="flex flex-col">
+                      <span className="text-[10px] font-bold text-zinc-450 mb-1 text-center block">
+                        Signature Upload (Select photo)
+                      </span>
+                      <div className="relative w-full h-32">
+                        <input
+                          type="file"
+                          id="signatureFile"
+                          accept="image/*"
+                          ref={fileInputRef}
+                          onChange={handleSignatureUpload}
+                          className="hidden"
+                        />
+                        
+                        <button
+                          type="button"
+                          onClick={() => fileInputRef.current?.click()}
+                          className="w-full h-full flex flex-col items-center justify-center border border-zinc-200 hover:border-rose-500 hover:bg-rose-50/20 rounded-2xl transition-all duration-200 cursor-pointer text-center group bg-zinc-50 shadow-sm"
+                        >
+                          <div className="w-8 h-8 bg-white rounded-full flex items-center justify-center text-zinc-400 group-hover:text-rose-500 mb-1 border border-zinc-200 transition-colors shadow-sm">
+                            {isProcessingUpload ? (
+                              <Loader2 className="w-4 h-4 animate-spin text-rose-500" />
+                            ) : (
+                              <Upload className="w-4 h-4" />
+                            )}
+                          </div>
+                          <span className="block text-xs font-semibold text-zinc-700">
+                            {isProcessingUpload ? 'Processing Signature...' : 'Select Signature Photo'}
+                          </span>
+                          <span className="block text-[9px] text-zinc-400">
+                            Dark ink on white paper
+                          </span>
+                        </button>
+                      </div>
+
+                      {signatureWarning && (
+                        <div className="mt-3 flex items-start gap-2 bg-red-50 border border-red-200 rounded-xl p-2.5 text-red-700 text-[10px]">
+                          <AlertCircle className="w-3.5 h-3.5 shrink-0 text-red-500 mt-0.5" />
+                          <div>
+                            <p className="font-semibold text-red-800">Contrast Warning</p>
+                            <p className="mt-0.5 text-[9px]">{signatureWarning}</p>
+                          </div>
                         </div>
-                        <span className="block text-xs font-semibold text-zinc-700">
-                          {isProcessingUpload ? 'Processing Signature...' : 'Select Signature Photo'}
-                        </span>
-                        <span className="block text-[9px] text-zinc-400">
-                          Dark ink on white paper
-                        </span>
-                      </button>
+                      )}
                     </div>
 
-                    {signatureWarning && (
-                      <div className="mt-3 flex items-start gap-2 bg-red-50 border border-red-200 rounded-xl p-2.5 text-red-700 text-[10px]">
-                        <AlertCircle className="w-3.5 h-3.5 shrink-0 text-red-500 mt-0.5" />
-                        <div>
-                          <p className="font-semibold text-red-800">Contrast Warning</p>
-                          <p className="mt-0.5 text-[9px]">{signatureWarning}</p>
-                        </div>
+                    {/* Right Column: Preview */}
+                    <div className="flex flex-col">
+                      <span className="text-[10px] font-bold text-zinc-450 mb-1 text-center block">
+                        Transparent Preview
+                      </span>
+                      
+                      <div className="w-full h-32 rounded-2xl border border-zinc-200 transparency-grid flex items-center justify-center overflow-hidden relative bg-zinc-50 p-2 shadow-inner">
+                        {signatureImage ? (
+                          <>
+                            <img 
+                              src={signatureImage} 
+                              alt="Signature preview" 
+                              className="max-h-full max-w-full object-contain filter drop-shadow-sm select-none"
+                            />
+                            <button
+                              type="button"
+                              onClick={handleClearUpload}
+                              className="absolute bottom-2 right-2 bg-white hover:bg-zinc-100 text-zinc-700 font-semibold px-2 py-0.5 rounded text-[9px] border border-zinc-200 flex items-center gap-0.5 shadow-sm transition-colors"
+                            >
+                              <RefreshCw className="w-2.5 h-2.5" />
+                              Clear
+                            </button>
+                          </>
+                        ) : (
+                          <div className="text-zinc-400 text-[10px] flex flex-col items-center gap-1">
+                            <PenTool className="w-4 h-4 text-zinc-300" />
+                            <span>Upload photo</span>
+                          </div>
+                        )}
                       </div>
-                    )}
+                    </div>
                   </div>
                 )}
-
-                {/* Signature Preview Frame */}
-                <div className="flex flex-col">
-                  <span className="text-[10px] font-bold text-zinc-450 mb-1 text-center block">
-                    Transparent Preview
-                  </span>
-                  
-                  <div className="w-full h-32 rounded-2xl border border-zinc-200 transparency-grid flex items-center justify-center overflow-hidden relative bg-zinc-50 p-2 shadow-inner">
-                    {signatureImage ? (
-                      <>
-                        <img 
-                          src={signatureImage} 
-                          alt="Signature preview" 
-                          className="max-h-full max-w-full object-contain filter drop-shadow-sm select-none"
-                        />
-                        {signatureMethod === 'upload' && (
-                          <button
-                            type="button"
-                            onClick={handleClearUpload}
-                            className="absolute bottom-2 right-2 bg-white hover:bg-zinc-100 text-zinc-700 font-semibold px-2 py-0.5 rounded text-[9px] border border-zinc-200 flex items-center gap-0.5 shadow-sm transition-colors"
-                          >
-                            <RefreshCw className="w-2.5 h-2.5" />
-                            Clear
-                          </button>
-                        )}
-                      </>
-                    ) : (
-                      <div className="text-zinc-400 text-[10px] flex flex-col items-center gap-1">
-                        <PenTool className="w-4 h-4 text-zinc-300" />
-                        <span>{signatureMethod === 'draw' ? 'Draw on pad' : 'Upload photo'}</span>
-                      </div>
-                    )}
-                  </div>
-                </div>
 
               </div>
             </div>
