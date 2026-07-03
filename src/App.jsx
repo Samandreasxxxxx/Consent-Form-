@@ -705,19 +705,17 @@ function App() {
                         penColor="black"
                         onEnd={handleDrawEnd}
                         canvasProps={{
-                          className: "w-full h-full cursor-crosshair rounded-xl"
+                          className: "w-full h-[120px] cursor-crosshair rounded-xl"
                         }}
                       />
-                      {signatureImage && (
-                        <button
-                          type="button"
-                          onClick={handleClearDraw}
-                          className="absolute bottom-2 right-2 bg-white hover:bg-zinc-100 text-zinc-700 font-semibold px-2 py-0.5 rounded text-[9px] border border-zinc-200 flex items-center gap-0.5 shadow-sm transition-colors z-10"
-                        >
-                          <RefreshCw className="w-2.5 h-2.5" />
-                          Clear
-                        </button>
-                      )}
+                      <button
+                        type="button"
+                        onClick={handleClearDraw}
+                        className="absolute bottom-2 right-2 bg-white hover:bg-zinc-100 text-zinc-700 font-semibold px-2 py-0.5 rounded text-[9px] border border-zinc-200 flex items-center gap-0.5 shadow-sm transition-colors z-10"
+                      >
+                        <RefreshCw className="w-2.5 h-2.5" />
+                        Clear
+                      </button>
                     </div>
                   </div>
                 )}
@@ -843,8 +841,8 @@ function App() {
             <div className="pt-2">
               <button
                 type="submit"
-                disabled={isSubmitting || !isWaiverRead || !signatureImage || !!signatureWarning}
-                className="w-full flex items-center justify-center gap-2.5 px-6 py-4 rounded-2xl bg-gradient-to-r from-rose-600 to-rose-700 hover:from-rose-500 hover:to-rose-650 text-white font-extrabold transition-all duration-200 shadow-md shadow-rose-500/10 disabled:opacity-50 disabled:cursor-not-allowed focus:ring-2 focus:ring-rose-500/50 text-sm cursor-pointer"
+                disabled={isSubmitting}
+                className="w-full flex items-center justify-center gap-2.5 px-6 py-4 rounded-2xl bg-gradient-to-r from-rose-600 to-rose-700 hover:from-rose-500 hover:to-rose-650 text-white font-extrabold transition-all duration-200 shadow-md shadow-rose-500/10 disabled:opacity-50 focus:ring-2 focus:ring-rose-500/50 text-sm cursor-pointer"
               >
                 {isSubmitting ? (
                   <>
