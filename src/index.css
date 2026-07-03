@@ -10,12 +10,12 @@
   border-radius: 4px;
 }
 .custom-scrollbar::-webkit-scrollbar-thumb {
-  background: rgba(132, 204, 22, 0.3); /* lime-500 with opacity */
+  background: rgba(244, 63, 94, 0.3); /* rose-500 with opacity */
   border-radius: 4px;
-  border: 1px solid rgba(132, 204, 22, 0.1);
+  border: 1px solid rgba(244, 63, 94, 0.1);
 }
 .custom-scrollbar::-webkit-scrollbar-thumb:hover {
-  background: rgba(132, 204, 22, 0.6); /* lime-500 with higher opacity */
+  background: rgba(244, 63, 94, 0.6); /* rose-500 with higher opacity */
 }
 
 /* Transparency check pattern for signature preview */
