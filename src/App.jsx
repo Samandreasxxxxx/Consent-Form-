@@ -120,8 +120,14 @@ function App() {
   const handleDrawEnd = () => {
     if (sigPadRef.current) {
       if (!sigPadRef.current.isEmpty()) {
-        const base64 = sigPadRef.current.getTrimmedCanvas().toDataURL('image/png');
-        setSignatureImage(base64);
+        try {
+          const base64 = sigPadRef.current.getTrimmedCanvas().toDataURL('image/png');
+          setSignatureImage(base64);
+        } catch (err) {
+          console.warn('Trimmed canvas failed, using raw canvas:', err);
+          const base64 = sigPadRef.current.getCanvas().toDataURL('image/png');
+          setSignatureImage(base64);
+        }
         setSignatureWarning('');
       }
     }
@@ -705,7 +711,9 @@ function App() {
                         penColor="black"
                         onEnd={handleDrawEnd}
                         canvasProps={{
-                          className: "w-full h-32 cursor-crosshair rounded-xl"
+                          className: "w-full h-32 cursor-crosshair rounded-xl",
+                          width: 500,
+                          height: 124
                         }}
                       />
                       <button
