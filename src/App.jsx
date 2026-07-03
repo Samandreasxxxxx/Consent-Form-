@@ -672,70 +672,80 @@ function App() {
               </div>
 
               {/* Signature Area Grid */}
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4 items-center">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4 items-start">
                 
                 {/* Tab 1: Draw Signature Pad */}
                 {signatureMethod === 'draw' && (
-                  <div>
-                    <div className="border border-zinc-200 rounded-2xl overflow-hidden bg-white p-1">
+                  <div className="flex flex-col">
+                    <span className="text-[10px] font-bold text-zinc-450 mb-1 text-center block">
+                      Signature Pad (Draw here)
+                    </span>
+                    <div className="w-full h-32 border border-zinc-200 rounded-2xl overflow-hidden bg-white p-1 relative shadow-sm">
                       <SignatureCanvas 
                         ref={sigPadRef}
                         penColor="black"
                         onEnd={handleDrawEnd}
                         canvasProps={{
-                          className: "w-full h-32 cursor-crosshair rounded-xl"
+                          className: "w-full h-full cursor-crosshair rounded-xl"
                         }}
                       />
+                      {signatureImage && (
+                        <button
+                          type="button"
+                          onClick={handleClearDraw}
+                          className="absolute bottom-2 right-2 bg-white hover:bg-zinc-100 text-zinc-700 font-semibold px-2 py-0.5 rounded text-[9px] border border-zinc-200 flex items-center gap-0.5 shadow-sm transition-colors z-10"
+                        >
+                          <RefreshCw className="w-2.5 h-2.5" />
+                          Clear
+                        </button>
+                      )}
                     </div>
-                    <button
-                      type="button"
-                      onClick={handleClearDraw}
-                      className="mt-2 bg-zinc-100 hover:bg-zinc-200 text-zinc-700 font-semibold px-3 py-1.5 rounded-xl text-[10px] border border-zinc-200 flex items-center gap-1.5 shadow-sm transition-colors"
-                    >
-                      <RefreshCw className="w-2.5 h-2.5" />
-                      Clear Signature Pad
-                    </button>
                   </div>
                 )}
 
                 {/* Tab 2: Upload File Panel */}
                 {signatureMethod === 'upload' && (
-                  <div>
-                    <input
-                      type="file"
-                      id="signatureFile"
-                      accept="image/*"
-                      ref={fileInputRef}
-                      onChange={handleSignatureUpload}
-                      className="hidden"
-                    />
-                    
-                    <button
-                      type="button"
-                      onClick={() => fileInputRef.current?.click()}
-                      className="w-full flex flex-col items-center justify-center border border-zinc-200 hover:border-rose-500 hover:bg-rose-50/20 rounded-2xl p-4 transition-all duration-200 cursor-pointer text-center group bg-zinc-50"
-                    >
-                      <div className="w-10 h-10 bg-white rounded-full flex items-center justify-center text-zinc-400 group-hover:text-rose-500 mb-2 border border-zinc-200 transition-colors shadow-sm">
-                        {isProcessingUpload ? (
-                          <Loader2 className="w-5 h-5 animate-spin text-rose-500" />
-                        ) : (
-                          <Upload className="w-5 h-5" />
-                        )}
-                      </div>
-                      <span className="block text-xs font-semibold text-zinc-700">
-                        {isProcessingUpload ? 'Processing Signature...' : 'Select Signature Photo'}
-                      </span>
-                      <span className="block text-[10px] text-zinc-450 mt-0.5">
-                        Dark ink on white paper
-                      </span>
-                    </button>
+                  <div className="flex flex-col">
+                    <span className="text-[10px] font-bold text-zinc-450 mb-1 text-center block">
+                      Signature Upload (Select photo)
+                    </span>
+                    <div className="relative w-full h-32">
+                      <input
+                        type="file"
+                        id="signatureFile"
+                        accept="image/*"
+                        ref={fileInputRef}
+                        onChange={handleSignatureUpload}
+                        className="hidden"
+                      />
+                      
+                      <button
+                        type="button"
+                        onClick={() => fileInputRef.current?.click()}
+                        className="w-full h-full flex flex-col items-center justify-center border border-zinc-200 hover:border-rose-500 hover:bg-rose-50/20 rounded-2xl transition-all duration-200 cursor-pointer text-center group bg-zinc-50 shadow-sm"
+                      >
+                        <div className="w-8 h-8 bg-white rounded-full flex items-center justify-center text-zinc-400 group-hover:text-rose-500 mb-1 border border-zinc-200 transition-colors shadow-sm">
+                          {isProcessingUpload ? (
+                            <Loader2 className="w-4 h-4 animate-spin text-rose-500" />
+                          ) : (
+                            <Upload className="w-4 h-4" />
+                          )}
+                        </div>
+                        <span className="block text-xs font-semibold text-zinc-700">
+                          {isProcessingUpload ? 'Processing Signature...' : 'Select Signature Photo'}
+                        </span>
+                        <span className="block text-[9px] text-zinc-400">
+                          Dark ink on white paper
+                        </span>
+                      </button>
+                    </div>
 
                     {signatureWarning && (
                       <div className="mt-3 flex items-start gap-2 bg-red-50 border border-red-200 rounded-xl p-2.5 text-red-700 text-[10px]">
                         <AlertCircle className="w-3.5 h-3.5 shrink-0 text-red-500 mt-0.5" />
                         <div>
                           <p className="font-semibold text-red-800">Contrast Warning</p>
-                          <p className="mt-0.5">{signatureWarning}</p>
+                          <p className="mt-0.5 text-[9px]">{signatureWarning}</p>
                         </div>
                       </div>
                     )}
@@ -743,8 +753,8 @@ function App() {
                 )}
 
                 {/* Signature Preview Frame */}
-                <div className="flex flex-col items-center">
-                  <span className="text-[10px] font-bold text-zinc-400 mb-1">
+                <div className="flex flex-col">
+                  <span className="text-[10px] font-bold text-zinc-450 mb-1 text-center block">
                     Transparent Preview
                   </span>
                   
@@ -760,7 +770,7 @@ function App() {
                           <button
                             type="button"
                             onClick={handleClearUpload}
-                            className="absolute bottom-2 right-2 bg-white hover:bg-zinc-100 text-zinc-700 font-semibold px-2 py-0.5 rounded text-[9px] border border-zinc-200 flex items-center gap-0.5 shadow transition-colors"
+                            className="absolute bottom-2 right-2 bg-white hover:bg-zinc-100 text-zinc-700 font-semibold px-2 py-0.5 rounded text-[9px] border border-zinc-200 flex items-center gap-0.5 shadow-sm transition-colors"
                           >
                             <RefreshCw className="w-2.5 h-2.5" />
                             Clear
