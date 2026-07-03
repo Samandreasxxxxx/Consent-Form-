@@ -5,21 +5,18 @@ import {
   FileText, 
   User, 
   Mail, 
-  Calendar, 
   MapPin, 
   Phone, 
   AlertCircle, 
   CheckCircle2, 
   PenTool, 
   Upload, 
-  Activity, 
-  ShieldAlert, 
   Loader2, 
   Sparkles,
   ArrowRight,
   RefreshCw,
-  Building,
-  HeartHandshake
+  HeartHandshake,
+  ShieldAlert
 } from 'lucide-react';
 
 // EmailJS placeholders. Users can modify these to connect their account.
@@ -40,11 +37,10 @@ function App() {
     email: '',
     age: '',
     tripType: 'Standard Sightseeing',
-    occupation: '', // Inclusive: replaced college
     mobile: '',
     emergencyContactName: '',
     emergencyContactPhone: '',
-    parentName: '' // Dynamic: guardian name for minors
+    parentName: '' // Dynamic guardian name for minors
   });
 
   // UI & Processing States
@@ -169,8 +165,6 @@ function App() {
 
         const avgBrightness = totalBrightness / totalPixels;
 
-        // Validation: If overall image is too dark (average brightness below 120),
-        // warning is triggered and submission disabled
         if (avgBrightness < 120) {
           setSignatureWarning('Please ensure your signature is clear and in dark ink on white paper.');
           setSignatureImage(null);
@@ -270,8 +264,8 @@ function App() {
         customer_name: customerDisplayName,
         customer_email: formData.email,
         trip_type: formData.tripType,
-        trip_date: tripDateString, // generated date
-        signature_image: signatureImage, // base64 transparent signature
+        trip_date: tripDateString,
+        signature_image: signatureImage,
         timestamp: fullTimestampString,
         ip_address: ipAddress,
         user_agent: navigator.userAgent
@@ -347,7 +341,7 @@ function App() {
           </div>
 
           <p className="text-slate-400 text-xs mb-6">
-            A confirmation receipt copy with your inline details and signature has been sent to your email address.
+            A confirmation copy with your details and signature has been sent to your email.
           </p>
 
           <button
@@ -358,7 +352,6 @@ function App() {
                 email: '',
                 age: '',
                 tripType: 'Standard Sightseeing',
-                occupation: '',
                 mobile: '',
                 emergencyContactName: '',
                 emergencyContactPhone: '',
@@ -382,7 +375,7 @@ function App() {
       {/* Hidden processing canvas */}
       <canvas ref={canvasRef} className="hidden" />
 
-      {/* Main Container: Landscape Layout on Desktop / Portrait on Mobile */}
+      {/* Main Container */}
       <div className="w-full max-w-7xl bg-slate-900/60 backdrop-blur-xl border border-slate-800 shadow-2xl rounded-3xl overflow-hidden relative">
         
         {/* Glow gradients */}
@@ -446,10 +439,10 @@ function App() {
           </details>
         </div>
 
-        {/* Main Grid: Responsive split column layout */}
+        {/* Main Grid: Split Column Landscape Layout */}
         <form onSubmit={handleSubmit} className="p-6 md:p-8 lg:grid lg:grid-cols-12 lg:gap-8 space-y-8 lg:space-y-0">
           
-          {/* LEFT COLUMN: Registrant & Trip Inputs (col-span-5) */}
+          {/* LEFT COLUMN: Input Details, Signature, Audit Trail, and Submit Button (col-span-5) */}
           <div className="lg:col-span-5 space-y-6">
             
             {/* Section 1: Trip Details */}
@@ -582,26 +575,6 @@ function App() {
                 </div>
               )}
 
-              <div>
-                <label htmlFor="occupation" className="block text-xs font-semibold text-slate-300 mb-2">
-                  Occupation / Organization (Optional)
-                </label>
-                <div className="relative">
-                  <span className="absolute inset-y-0 left-0 pl-3.5 flex items-center text-slate-500 pointer-events-none">
-                    <Building className="w-4 h-4" />
-                  </span>
-                  <input
-                    type="text"
-                    id="occupation"
-                    name="occupation"
-                    placeholder="e.g., Professional, Self-employed, Student"
-                    value={formData.occupation}
-                    onChange={handleInputChange}
-                    className="w-full bg-slate-950/80 border border-slate-800 rounded-xl pl-10 pr-4 py-3 text-slate-100 placeholder-slate-500 focus:ring-2 focus:ring-lime-500 focus:border-transparent transition-all duration-200 text-sm"
-                  />
-                </div>
-              </div>
-
               <div className="grid grid-cols-1 gap-4">
                 <div>
                   <label htmlFor="mobile" className="block text-xs font-semibold text-slate-300 mb-2">
@@ -660,22 +633,223 @@ function App() {
               </div>
             </div>
 
-          </div>
-
-          {/* RIGHT COLUMN: Waiver, Signature & Submit (col-span-7) */}
-          <div className="lg:col-span-7 space-y-6 flex flex-col justify-between">
-            
-            {/* Section 3: Waiver Agreement (Expanded for less scrolling) */}
-            <div className="bg-slate-900/40 p-5 rounded-2xl border border-slate-800/80">
-              <div className="flex items-center gap-2 border-b border-slate-800 pb-2 mb-3">
-                <FileText className="w-5 h-5 text-lime-400" />
-                <h2 className="text-base md:text-lg font-bold text-white">3. Review Consent Waiver</h2>
+            {/* Section 4: Dual Signature Component (Shifted from Right Column) */}
+            <div className="bg-slate-900/40 p-5 rounded-2xl border border-slate-800/80 space-y-4">
+              <div className="flex items-center gap-2 border-b border-slate-800 pb-2">
+                <PenTool className="w-5 h-5 text-lime-400" />
+                <h2 className="text-base md:text-lg font-bold text-white">
+                  {isMinor ? "3. Parent / Guardian Consent Signature" : "3. Provide Consent Signature"}
+                </h2>
               </div>
               
+              <p className="text-xs text-slate-400">
+                {isMinor 
+                  ? "As the participant is a minor, the parent/guardian must sign below."
+                  : "Please choose your signature format: draw on the pad or upload an image."}
+              </p>
+
+              {/* Method Tabs */}
+              <div className="flex border-b border-slate-800 max-w-xs">
+                <button
+                  type="button"
+                  onClick={() => handleTabChange('draw')}
+                  className={`flex-1 pb-2 text-xs font-semibold border-b-2 text-center transition-all duration-200 ${
+                    signatureMethod === 'draw' 
+                      ? 'border-lime-500 text-lime-400' 
+                      : 'border-transparent text-slate-400 hover:text-slate-200'
+                  }`}
+                >
+                  ✏️ Draw Pad
+                </button>
+                <button
+                  type="button"
+                  onClick={() => handleTabChange('upload')}
+                  className={`flex-1 pb-2 text-xs font-semibold border-b-2 text-center transition-all duration-200 ${
+                    signatureMethod === 'upload' 
+                      ? 'border-lime-500 text-lime-400' 
+                      : 'border-transparent text-slate-400 hover:text-slate-200'
+                  }`}
+                >
+                  📂 Upload Photo
+                </button>
+              </div>
+
+              {/* Signature Area Grid */}
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4 items-center">
+                
+                {/* Tab 1: Draw Signature Pad */}
+                {signatureMethod === 'draw' && (
+                  <div>
+                    <div className="border border-slate-700 rounded-2xl overflow-hidden bg-white p-1">
+                      <SignatureCanvas 
+                        ref={sigPadRef}
+                        penColor="black"
+                        onEnd={handleDrawEnd}
+                        canvasProps={{
+                          className: "w-full h-32 cursor-crosshair rounded-xl"
+                        }}
+                      />
+                    </div>
+                    <button
+                      type="button"
+                      onClick={handleClearDraw}
+                      className="mt-2 bg-slate-850 hover:bg-slate-800 text-slate-300 font-semibold px-3 py-1.5 rounded-xl text-[10px] border border-slate-700 flex items-center gap-1.5 shadow transition-colors"
+                    >
+                      <RefreshCw className="w-2.5 h-2.5" />
+                      Clear Signature Pad
+                    </button>
+                  </div>
+                )}
+
+                {/* Tab 2: Upload File Panel */}
+                {signatureMethod === 'upload' && (
+                  <div>
+                    <input
+                      type="file"
+                      id="signatureFile"
+                      accept="image/*"
+                      ref={fileInputRef}
+                      onChange={handleSignatureUpload}
+                      className="hidden"
+                    />
+                    
+                    <button
+                      type="button"
+                      onClick={() => fileInputRef.current?.click()}
+                      className="w-full flex flex-col items-center justify-center border border-slate-800 hover:border-lime-500 hover:bg-slate-850/50 rounded-2xl p-4 transition-all duration-200 cursor-pointer text-center group bg-slate-950/20"
+                    >
+                      <div className="w-10 h-10 bg-slate-950/80 rounded-full flex items-center justify-center text-slate-400 group-hover:text-lime-400 mb-2 border border-slate-800 transition-colors">
+                        {isProcessingUpload ? (
+                          <Loader2 className="w-5 h-5 animate-spin text-lime-400" />
+                        ) : (
+                          <Upload className="w-5 h-5" />
+                        )}
+                      </div>
+                      <span className="block text-xs font-semibold text-slate-200">
+                        {isProcessingUpload ? 'Processing Signature...' : 'Select Signature Photo'}
+                      </span>
+                      <span className="block text-[10px] text-slate-500 mt-0.5">
+                        Dark ink on white paper
+                      </span>
+                    </button>
+
+                    {signatureWarning && (
+                      <div className="mt-3 flex items-start gap-2 bg-red-950/40 border border-red-900/60 rounded-xl p-2.5 text-red-300 text-[10px]">
+                        <AlertCircle className="w-3.5 h-3.5 shrink-0 text-red-400 mt-0.5" />
+                        <div>
+                          <p className="font-semibold text-red-200">Contrast Warning</p>
+                          <p className="mt-0.5">{signatureWarning}</p>
+                        </div>
+                      </div>
+                    )}
+                  </div>
+                )}
+
+                {/* Signature Preview Frame */}
+                <div className="flex flex-col items-center">
+                  <span className="text-[10px] font-bold text-slate-400 mb-1">
+                    Transparent Preview
+                  </span>
+                  
+                  <div className="w-full h-32 rounded-2xl border border-slate-800 transparency-grid flex items-center justify-center overflow-hidden relative bg-slate-950/60 p-2 shadow-inner">
+                    {signatureImage ? (
+                      <>
+                        <img 
+                          src={signatureImage} 
+                          alt="Signature preview" 
+                          className="max-h-full max-w-full object-contain filter drop-shadow-sm select-none"
+                        />
+                        {signatureMethod === 'upload' && (
+                          <button
+                            type="button"
+                            onClick={handleClearUpload}
+                            className="absolute bottom-2 right-2 bg-slate-800 hover:bg-slate-750 text-slate-300 font-semibold px-2 py-0.5 rounded text-[9px] border border-slate-700 flex items-center gap-0.5 shadow transition-colors"
+                          >
+                            <RefreshCw className="w-2.5 h-2.5" />
+                            Clear
+                          </button>
+                        )}
+                      </>
+                    ) : (
+                      <div className="text-slate-600 text-[10px] flex flex-col items-center gap-1">
+                        <PenTool className="w-4 h-4 text-slate-750" />
+                        <span>{signatureMethod === 'draw' ? 'Draw on pad' : 'Upload photo'}</span>
+                      </div>
+                    )}
+                  </div>
+                </div>
+
+              </div>
+            </div>
+
+            {/* Audit Trail Metadata View (Shifted from Right Column) */}
+            <div className="bg-slate-950/50 rounded-2xl p-4 border border-slate-850 text-[10px] text-slate-400 space-y-1">
+              <span className="font-bold text-slate-300 tracking-wider text-xs block mb-0.5">
+                DIGITAL AUDIT TRAIL METADATA
+              </span>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-1 md:gap-4">
+                <div>
+                  <span className="font-semibold text-slate-500">System IP Address: </span>
+                  <span className="text-slate-300">{ipAddress}</span>
+                </div>
+                <div>
+                  <span className="font-semibold text-slate-500">Document Timestamp: </span>
+                  <span className="text-slate-300">{new Date().toLocaleString()}</span>
+                </div>
+              </div>
+              <div className="pt-1 border-t border-slate-900">
+                <span className="font-semibold text-slate-500">User Agent: </span>
+                <span className="text-slate-300 break-all">{navigator.userAgent}</span>
+              </div>
+            </div>
+
+            {/* Submit Action Block (Shifted from Right Column) */}
+            {submitError && (
+              <div className="flex items-start gap-2 bg-red-950/40 border border-red-900/60 rounded-2xl p-4 text-red-300 text-xs">
+                <ShieldAlert className="w-5 h-5 text-red-400 shrink-0 mt-0.5" />
+                <div>
+                  <p className="font-semibold text-red-200">Submission Blocked</p>
+                  <p className="mt-0.5">{submitError}</p>
+                </div>
+              </div>
+            )}
+
+            <div className="pt-2">
+              <button
+                type="submit"
+                disabled={isSubmitting || !isWaiverRead || !signatureImage || !!signatureWarning}
+                className="w-full flex items-center justify-center gap-2.5 px-6 py-4 rounded-2xl bg-gradient-to-r from-lime-400 to-lime-500 hover:from-lime-300 hover:to-lime-400 text-slate-950 font-extrabold transition-all duration-200 shadow-xl shadow-lime-500/5 disabled:opacity-50 disabled:cursor-not-allowed focus:ring-2 focus:ring-lime-500/50 text-sm cursor-pointer"
+              >
+                {isSubmitting ? (
+                  <>
+                    <Loader2 className="w-4 h-4 animate-spin" />
+                    Submitting Consent Form...
+                  </>
+                ) : (
+                  <>
+                    Submit & Sign Consent Document
+                    <ArrowRight className="w-4 h-4" />
+                  </>
+                )}
+              </button>
+            </div>
+
+          </div>
+
+          {/* RIGHT COLUMN: Elongated Consent Waiver Box (col-span-7) */}
+          <div className="lg:col-span-7 space-y-6 flex flex-col h-full justify-between">
+            
+            <div className="bg-slate-900/40 p-5 rounded-2xl border border-slate-800/80 flex flex-col h-full justify-between">
+              <div className="flex items-center gap-2 border-b border-slate-800 pb-2 mb-3">
+                <FileText className="w-5 h-5 text-lime-400" />
+                <h2 className="text-base md:text-lg font-bold text-white">4. Review Consent Waiver</h2>
+              </div>
+              
+              {/* Elongated scrolling waiver content */}
               <div 
                 ref={waiverRef}
                 onScroll={handleWaiverScroll}
-                className="h-[360px] overflow-y-auto border border-slate-800 rounded-2xl p-5 bg-slate-950/60 custom-scrollbar space-y-4 text-xs text-slate-300 leading-relaxed"
+                className="h-[360px] lg:h-[750px] overflow-y-auto border border-slate-800 rounded-2xl p-5 bg-slate-950/60 custom-scrollbar space-y-4 text-xs text-slate-300 leading-relaxed"
               >
                 <h3 className="text-center font-extrabold text-slate-100 border-b border-slate-800 pb-3 text-[13px] tracking-wide">
                   TOUR TERMS, CONDITIONS, AND LIABILITY WAIVER
@@ -781,207 +955,6 @@ function App() {
                   )}
                 </label>
               </div>
-            </div>
-
-            {/* Section 4: Dual Signature Component */}
-            <div className="bg-slate-900/40 p-5 rounded-2xl border border-slate-800/80">
-              <div className="flex items-center gap-2 border-b border-slate-800 pb-2 mb-3">
-                <PenTool className="w-5 h-5 text-lime-400" />
-                <h2 className="text-base md:text-lg font-bold text-white">
-                  {isMinor ? "4. Parent / Guardian Consent Signature" : "4. Provide Consent Signature"}
-                </h2>
-              </div>
-              
-              <p className="text-xs text-slate-400 mb-3">
-                {isMinor 
-                  ? "As the participant is a minor, the parent/guardian must sign below."
-                  : "Please choose your signature format: draw on the pad or upload an image."}
-              </p>
-
-              {/* Method Tabs */}
-              <div className="flex border-b border-slate-800 mb-4 max-w-xs">
-                <button
-                  type="button"
-                  onClick={() => handleTabChange('draw')}
-                  className={`flex-1 pb-2 text-xs font-semibold border-b-2 text-center transition-all duration-200 ${
-                    signatureMethod === 'draw' 
-                      ? 'border-lime-500 text-lime-400' 
-                      : 'border-transparent text-slate-400 hover:text-slate-200'
-                  }`}
-                >
-                  ✏️ Draw Pad
-                </button>
-                <button
-                  type="button"
-                  onClick={() => handleTabChange('upload')}
-                  className={`flex-1 pb-2 text-xs font-semibold border-b-2 text-center transition-all duration-200 ${
-                    signatureMethod === 'upload' 
-                      ? 'border-lime-500 text-lime-400' 
-                      : 'border-transparent text-slate-400 hover:text-slate-200'
-                  }`}
-                >
-                  📂 Upload Photo
-                </button>
-              </div>
-
-              {/* Signature Area Grid */}
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4 items-center">
-                
-                {/* Tab 1: Draw Signature Pad */}
-                {signatureMethod === 'draw' && (
-                  <div>
-                    <div className="border border-slate-700 rounded-2xl overflow-hidden bg-white p-1">
-                      <SignatureCanvas 
-                        ref={sigPadRef}
-                        penColor="black"
-                        onEnd={handleDrawEnd}
-                        canvasProps={{
-                          className: "w-full h-32 cursor-crosshair rounded-xl"
-                        }}
-                      />
-                    </div>
-                    <button
-                      type="button"
-                      onClick={handleClearDraw}
-                      className="mt-2 bg-slate-850 hover:bg-slate-800 text-slate-300 font-semibold px-3 py-1.5 rounded-xl text-[10px] border border-slate-700 flex items-center gap-1 shadow transition-colors"
-                    >
-                      <RefreshCw className="w-2.5 h-2.5" />
-                      Clear Signature Pad
-                    </button>
-                  </div>
-                )}
-
-                {/* Tab 2: Upload File Panel */}
-                {signatureMethod === 'upload' && (
-                  <div>
-                    <input
-                      type="file"
-                      id="signatureFile"
-                      accept="image/*"
-                      ref={fileInputRef}
-                      onChange={handleSignatureUpload}
-                      className="hidden"
-                    />
-                    
-                    <button
-                      type="button"
-                      onClick={() => fileInputRef.current?.click()}
-                      className="w-full flex flex-col items-center justify-center border border-slate-800 hover:border-lime-500 hover:bg-slate-850/50 rounded-2xl p-4 transition-all duration-200 cursor-pointer text-center group bg-slate-950/20"
-                    >
-                      <div className="w-10 h-10 bg-slate-950/80 rounded-full flex items-center justify-center text-slate-400 group-hover:text-lime-400 mb-2 border border-slate-800 transition-colors">
-                        {isProcessingUpload ? (
-                          <Loader2 className="w-5 h-5 animate-spin text-lime-400" />
-                        ) : (
-                          <Upload className="w-5 h-5" />
-                        )}
-                      </div>
-                      <span className="block text-xs font-semibold text-slate-200">
-                        {isProcessingUpload ? 'Processing Signature...' : 'Select Signature Photo'}
-                      </span>
-                      <span className="block text-[10px] text-slate-500 mt-0.5">
-                        Dark ink on white paper
-                      </span>
-                    </button>
-
-                    {signatureWarning && (
-                      <div className="mt-3 flex items-start gap-2 bg-red-950/40 border border-red-900/60 rounded-xl p-2.5 text-red-300 text-[10px]">
-                        <AlertCircle className="w-3.5 h-3.5 shrink-0 text-red-400 mt-0.5" />
-                        <div>
-                          <p className="font-semibold text-red-200">Contrast Warning</p>
-                          <p className="mt-0.5">{signatureWarning}</p>
-                        </div>
-                      </div>
-                    )}
-                  </div>
-                )}
-
-                {/* Signature Preview Frame */}
-                <div className="flex flex-col items-center">
-                  <span className="text-[10px] font-bold text-slate-400 mb-1">
-                    Transparent Signature Preview
-                  </span>
-                  
-                  <div className="w-full h-32 rounded-2xl border border-slate-800 transparency-grid flex items-center justify-center overflow-hidden relative bg-slate-950/60 p-2 shadow-inner">
-                    {signatureImage ? (
-                      <>
-                        <img 
-                          src={signatureImage} 
-                          alt="Signature preview" 
-                          className="max-h-full max-w-full object-contain filter drop-shadow-sm select-none"
-                        />
-                        {signatureMethod === 'upload' && (
-                          <button
-                            type="button"
-                            onClick={handleClearUpload}
-                            className="absolute bottom-2 right-2 bg-slate-800 hover:bg-slate-750 text-slate-300 font-semibold px-2 py-0.5 rounded text-[9px] border border-slate-700 flex items-center gap-0.5 shadow transition-colors"
-                          >
-                            <RefreshCw className="w-2.5 h-2.5" />
-                            Clear
-                          </button>
-                        )}
-                      </>
-                    ) : (
-                      <div className="text-slate-600 text-[10px] flex flex-col items-center gap-1">
-                        <PenTool className="w-4 h-4 text-slate-750" />
-                        <span>{signatureMethod === 'draw' ? 'Draw on pad' : 'Upload photo'}</span>
-                      </div>
-                    )}
-                  </div>
-                </div>
-
-              </div>
-            </div>
-
-            {/* Audit Trail Metadata View */}
-            <div className="bg-slate-950/50 rounded-2xl p-4 border border-slate-850 text-[10px] text-slate-400 space-y-1">
-              <span className="font-bold text-slate-300 tracking-wider text-xs block mb-0.5">
-                DIGITAL AUDIT TRAIL METADATA
-              </span>
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-1 md:gap-4">
-                <div>
-                  <span className="font-semibold text-slate-500">System IP Address: </span>
-                  <span className="text-slate-300">{ipAddress}</span>
-                </div>
-                <div>
-                  <span className="font-semibold text-slate-500">Document Timestamp: </span>
-                  <span className="text-slate-300">{new Date().toLocaleString()}</span>
-                </div>
-              </div>
-              <div className="pt-1 border-t border-slate-900">
-                <span className="font-semibold text-slate-500">User Agent: </span>
-                <span className="text-slate-300 break-all">{navigator.userAgent}</span>
-              </div>
-            </div>
-
-            {/* Submit Action Block */}
-            {submitError && (
-              <div className="flex items-start gap-2 bg-red-950/40 border border-red-900/60 rounded-2xl p-4 text-red-300 text-xs">
-                <ShieldAlert className="w-5 h-5 text-red-400 shrink-0 mt-0.5" />
-                <div>
-                  <p className="font-semibold text-red-200">Submission Blocked</p>
-                  <p className="mt-0.5">{submitError}</p>
-                </div>
-              </div>
-            )}
-
-            <div className="pt-2">
-              <button
-                type="submit"
-                disabled={isSubmitting || !isWaiverRead || !signatureImage || !!signatureWarning}
-                className="w-full flex items-center justify-center gap-2.5 px-6 py-4 rounded-2xl bg-gradient-to-r from-lime-400 to-lime-500 hover:from-lime-300 hover:to-lime-400 text-slate-950 font-extrabold transition-all duration-200 shadow-xl shadow-lime-500/5 disabled:opacity-50 disabled:cursor-not-allowed focus:ring-2 focus:ring-lime-500/50 text-sm cursor-pointer"
-              >
-                {isSubmitting ? (
-                  <>
-                    <Loader2 className="w-4 h-4 animate-spin" />
-                    Submitting Consent Form...
-                  </>
-                ) : (
-                  <>
-                    Submit & Sign Consent Document
-                    <ArrowRight className="w-4 h-4" />
-                  </>
-                )}
-              </button>
             </div>
 
           </div>
