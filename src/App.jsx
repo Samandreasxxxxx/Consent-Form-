@@ -1045,20 +1045,13 @@ function App() {
                   <input
                     id="waiverCheckbox"
                     type="checkbox"
-                    disabled={!scrolledToBottom}
                     checked={isWaiverRead}
                     onChange={(e) => setIsWaiverRead(e.target.checked)}
-                    className="w-5 h-5 rounded border-zinc-300 text-rose-600 focus:ring-rose-500 bg-white focus:ring-2 cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed transition-all"
+                    className="w-5 h-5 rounded border-zinc-300 text-rose-600 focus:ring-rose-500 bg-white focus:ring-2 cursor-pointer transition-all"
                   />
                 </div>
-                <label htmlFor="waiverCheckbox" className="text-xs text-zinc-700 select-none">
-                  {!scrolledToBottom ? (
-                    <span className="text-amber-600 font-medium">
-                      ⚠️ Please scroll to the bottom of the waiver to enable and agree to these terms.
-                    </span>
-                  ) : (
-                    <span>I have read, understood, and agree to the <strong>Tour Terms, Conditions, and Liability Waiver</strong> above.</span>
-                  )}
+                <label htmlFor="waiverCheckbox" className="text-xs text-zinc-700 select-none cursor-pointer">
+                  I have read, understood, and agree to the <strong>Tour Terms, Conditions, and Liability Waiver</strong> above.
                 </label>
               </div>
             </div>
