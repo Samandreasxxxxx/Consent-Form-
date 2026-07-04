@@ -877,86 +877,164 @@ function App() {
               <div 
                 ref={waiverRef}
                 onScroll={handleWaiverScroll}
-                className="flex-1 overflow-y-auto border border-zinc-200 rounded-2xl p-5 bg-zinc-50 custom-scrollbar space-y-4 text-xs text-zinc-655 leading-relaxed h-[360px] lg:h-auto"
+                className="flex-1 overflow-y-auto border border-zinc-200 rounded-2xl p-5 bg-zinc-50 custom-scrollbar space-y-5 text-xs text-zinc-650 leading-relaxed h-[360px] lg:h-auto"
               >
-                <h3 className="text-center font-extrabold text-zinc-900 border-b border-zinc-200 pb-3 text-[13px] tracking-wide">
-                  TOUR TERMS, CONDITIONS, AND LIABILITY WAIVER
+                <h3 className="text-center font-extrabold text-zinc-900 border-b border-zinc-200 pb-3 text-[13px] tracking-wide uppercase">
+                  Comprehensive Travel Consent, Liability Waiver, and Terms of Agreement
                 </h3>
                 
-                <p className="italic text-zinc-500 text-center text-[11px]">
-                  By proceeding with this submission, I, the participant (or my parent/guardian if I am under 18 years of age) whose details are specified in the accompanying form, hereby voluntarily register for the tour organized by Ghumoo With Us and unconditionally agree to the following legally binding terms:
+                <p className="italic text-zinc-500 text-center text-[11px] border-b border-zinc-100 pb-3">
+                  This document outlines the terms, conditions, and assumed risks associated with participating in a Tour organized by Ghumoo With Us. Reading, understanding, and signing this document is a mandatory prerequisite for participation.
                 </p>
-                
+
+                {/* Part 1: General Information & Conduct */}
                 <div className="space-y-3">
-                  <p className="font-bold text-zinc-800 text-[11px]">1. Participant Code of Conduct & Discipline</p>
-                  <ul className="list-disc pl-5 space-y-1 text-zinc-600">
-                    <li><span className="font-semibold text-zinc-800">Zero-Tolerance Policy:</span> The consumption, possession, or distribution of alcohol, cigarettes, e-cigarettes, vapes, drugs, or any illegal intoxicating substances is strictly prohibited throughout the entire duration of the tour (including transit and hotel stays).</li>
-                    <li><span className="font-semibold text-zinc-800">Compliance:</span> I agree to strictly adhere to the itinerary timings, safety instructions, and decisions made by the assigned Tour Leader and organizers.</li>
-                    <li><span className="font-semibold text-zinc-800">Expulsion without Refund:</span> Any instance of misbehavior, indiscipline, late reporting, or failure to follow instructions will result in immediate removal from the tour. In such cases, the company is not liable to provide any alternative transport, accommodation, or financial refund.</li>
-                  </ul>
+                  <h4 className="font-bold text-rose-600 text-xs border-b border-zinc-100 pb-1 uppercase tracking-wider">
+                    Part 1: General Information & Conduct
+                  </h4>
+                  
+                  <div className="space-y-2">
+                    <p className="font-bold text-zinc-800 text-[11px]">1.1 Definitions</p>
+                    <ul className="list-disc pl-5 space-y-1 text-zinc-600">
+                      <li><span className="font-semibold text-zinc-800">"Company"</span> refers to Ghumoo With Us, its owners, directors, employees, guides, and representatives.</li>
+                      <li><span className="font-semibold text-zinc-800">"Participant"</span> refers to the individual signing this agreement (and their parent/guardian if under 18).</li>
+                      <li><span className="font-semibold text-zinc-800">"Tour"</span> refers to the specific trip, wildlife excursion, college trip, or event booked through the Company.</li>
+                    </ul>
+                  </div>
+
+                  <div className="space-y-2">
+                    <p className="font-bold text-zinc-800 text-[11px]">1.2 Voluntary Participation & Declaration</p>
+                    <p className="text-zinc-600 pl-1">
+                      I acknowledge that my participation in this Tour is entirely voluntary. I have chosen to participate knowing the itinerary and the physical demands required. I declare that all personal and medical information provided to the Company is true and accurate. I agree to abide by all terms set forth in this agreement.
+                    </p>
+                  </div>
+
+                  <div className="space-y-2">
+                    <p className="font-bold text-zinc-800 text-[11px]">1.3 Code of Conduct & Tour Discipline</p>
+                    <p className="text-zinc-600 pl-1">
+                      Participants are expected to behave respectfully toward fellow travelers, guides, locals, and the environment. I agree to strictly follow the schedule, timings, and safety instructions provided by the Tour Leader. Late reporting, misbehavior, or going off-itinerary without permission will result in strict disciplinary action, including being left behind at my own expense.
+                    </p>
+                  </div>
+
+                  <div className="space-y-2">
+                    <p className="font-bold text-zinc-800 text-[11px]">1.4 Zero-Tolerance Policy & Legal Compliance</p>
+                    <p className="text-zinc-600 pl-1">
+                      The possession, use, or distribution of illegal drugs, unauthorized substances, or weapons is strictly prohibited. Excessive alcohol consumption that disrupts the group or endangers safety is also forbidden. Violation of this policy will result in immediate removal from the Tour without refund, and a complete forfeiture of any Company assistance. I agree to comply with all local, state, and national laws of the destinations visited during the Tour.
+                    </p>
+                  </div>
                 </div>
 
+                {/* Part 2: Health, Safety & Strict Liability Waivers */}
                 <div className="space-y-3">
-                  <p className="font-bold text-zinc-800 text-[11px]">2. Financial Liability & Property Damage</p>
-                  <ul className="list-disc pl-5 space-y-1 text-zinc-600">
-                    <li><span className="font-semibold text-zinc-800">Property Damage:</span> I accept full financial responsibility for any damage caused by me to hotel rooms, vehicles, public property, or third-party equipment during the tour. All repair or replacement costs must be settled by me immediately on-site.</li>
-                    <li><span className="font-semibold text-zinc-800">Personal Belongings:</span> Ghumoo With Us acts solely as a facilitator. The company, its employees, and coordinators accept zero liability for the loss, theft, or damage of personal belongings, including mobile phones, wallets, cameras, luggage, or cash.</li>
-                  </ul>
-                </div>
-                
-                {/* Bold Risk Clause */}
-                <div className="pl-3 border-l-2 border-rose-500 bg-rose-50/50 py-2 px-3 rounded-r-xl">
-                  <p className="font-bold text-rose-700 text-[11px] mb-1">3. Absolute Assumption of Risk & Indemnity</p>
-                  <ul className="list-disc pl-4 space-y-1 text-zinc-700">
-                    <li><span className="font-bold">Inherent Risks:</span> I understand that travel, sightseeing, and adventure/wildlife activities involve inherent risks of delay, illness, personal injury, or unforeseen hazards.</li>
-                    <li><span className="font-bold">Release of Liability:</span> I voluntarily assume all risks associated with my participation. I hereby release, acquit, and forever discharge Ghumoo With Us, its directors, partners, and field staff from any and all legal claims, liabilities, demands, or lawsuits arising out of any personal injury, severe bodily harm, illness, medical emergency, or accidental death during the tour.</li>
-                  </ul>
+                  <h4 className="font-bold text-rose-600 text-xs border-b border-zinc-100 pb-1 uppercase tracking-wider">
+                    Part 2: Health, Safety & Strict Liability Waivers
+                  </h4>
+
+                  <div className="pl-3 border-l-2 border-rose-500 bg-rose-50/50 py-2 px-3 rounded-r-xl space-y-2">
+                    <p className="font-bold text-rose-700 text-[11px]">2.1 Company's Provision of Safety vs. Participant Violation</p>
+                    <p className="text-zinc-700 text-[11px] leading-relaxed">
+                      Ghumoo With Us commits to executing the Tour professionally, providing standard safety protections, correct logistical planning, and proper guidance from our side. However, these protections are strictly conditional upon the Participant’s compliance. If the Participant steps out of the provided guidelines, ignores the Tour Leader’s directives, or engages in unauthorized activities, all Company liability, protection, and responsibility are immediately voided.
+                    </p>
+                  </div>
+
+                  <div className="pl-3 border-l-2 border-rose-500 bg-rose-50/50 py-2 px-3 rounded-r-xl space-y-2">
+                    <p className="font-bold text-rose-700 text-[11px]">2.2 Absolute Financial Exoneration</p>
+                    <p className="text-zinc-700 text-[11px] leading-relaxed">
+                      I explicitly agree that if an accident, injury, property damage, legal issue, or death occurs because I violated Tour rules, acted negligently, or deviated from the provided safety guidelines, Ghumoo With Us will not pay for anything. I agree that I will not return to the Company seeking compensation, reimbursement, or payment of any kind for medical bills, rescue operations, transport, damages, or legal fees.
+                    </p>
+                  </div>
+
+                  <div className="space-y-2">
+                    <p className="font-bold text-zinc-800 text-[11px]">2.3 Medical Fitness & Emergency Authorization</p>
+                    <p className="text-zinc-600 pl-1">
+                      I certify that I am physically and mentally fit to participate in this Tour. In the event of a medical emergency where I am incapacitated, I authorize the Company to secure necessary medical treatment. I agree to bear 100% of the financial responsibility for all medical care, hospitalization, and emergency evacuation.
+                    </p>
+                  </div>
+
+                  <div className="space-y-2">
+                    <p className="font-bold text-zinc-800 text-[11px]">2.4 Assumption of Risk</p>
+                    <p className="text-zinc-600 pl-1">
+                      I fully understand that traveling entails known and unknown risks, including accidents, unpredictable weather, challenging terrain, remote locations with limited medical access, and the actions of other participants. I acknowledge that these risks may result in severe injury, psychological trauma, property damage, or death, and I voluntarily assume all such risks.
+                    </p>
+                  </div>
+
+                  <div className="space-y-2">
+                    <p className="font-bold text-zinc-800 text-[11px]">2.5 Adventure Activities & Wildlife Safety</p>
+                    <p className="text-zinc-600 pl-1">
+                      For Tours involving wildlife reserves or optional adventure activities (e.g., trekking, safaris), I understand the unpredictable and dangerous nature of these environments. I agree to strictly adhere to the guide’s instructions, remain inside designated vehicles, and refrain from disturbing wildlife. I participate entirely at my own risk.
+                    </p>
+                  </div>
+
+                  <div className="space-y-2">
+                    <p className="font-bold text-zinc-800 text-[11px]">2.6 Personal Belongings & Property Damage</p>
+                    <p className="text-zinc-600 pl-1">
+                      I am solely responsible for the safety of my baggage and electronics. The Company assumes no liability for lost or stolen items. I accept full financial responsibility for any damage I cause to hotel property, transport vehicles, or third-party facilities, and I will pay for such damages directly and immediately.
+                    </p>
+                  </div>
                 </div>
 
+                {/* Part 3: Operations & Logistics */}
                 <div className="space-y-3">
-                  <p className="font-bold text-zinc-800 text-[11px]">4. Medical Fitness & Emergency Authorization</p>
-                  <ul className="list-disc pl-5 space-y-1 text-zinc-600">
-                    <li>I certify that I am mentally and physically fit to undertake this travel itinerary. I have transparently disclosed any pre-existing medical conditions to the organizers prior to departure.</li>
-                    <li>In the event of a medical emergency, I authorize the tour coordinators to arrange for local medical treatment, hospitalization, or first-aid at my sole financial expense.</li>
-                  </ul>
-                </div>
-                
-                {/* Bold Force Majeure Clause */}
-                <div className="pl-3 border-l-2 border-rose-500 bg-rose-50/50 py-2 px-3 rounded-r-xl">
-                  <p className="font-bold text-rose-700 text-[11px] mb-1">5. Force Majeure & Third-Party Service Limitations</p>
-                  <ul className="list-disc pl-4 space-y-1 text-zinc-700">
-                    <li>Ghumoo With Us relies on third-party vendors (hotels, transport operators, safari vehicles). The company is not liable for deficiencies in service, accidents, or delays caused by these independent vendors.</li>
-                    <li><span className="font-bold">Unforeseen Events:</span> The company is not liable for tour cancellations, changes in itinerary, or incomplete sightseeing caused by Force Majeure events—including but not limited to landslides, floods, extreme weather, political strikes (bandhs), riots, road blockades, or sudden government/forest department restrictions. No refunds or compensations will be issued under these circumstances.</li>
-                  </ul>
+                  <h4 className="font-bold text-rose-600 text-xs border-b border-zinc-100 pb-1 uppercase tracking-wider">
+                    Part 3: Operations & Logistics
+                  </h4>
+
+                  <div className="space-y-2">
+                    <p className="font-bold text-zinc-800 text-[11px]">3.1 Force Majeure & Itinerary Changes</p>
+                    <p className="text-zinc-600 pl-1">
+                      The Company is not liable for any delays, cancellations, or alterations to the Tour caused by events beyond its control (natural disasters, severe weather, strikes, political unrest). The Company reserves the right to modify the itinerary at any time for the safety or logistical viability of the group.
+                    </p>
+                  </div>
+
+                  <div className="space-y-2">
+                    <p className="font-bold text-zinc-800 text-[11px]">3.2 Third-Party Services, Accommodations & Transport</p>
+                    <p className="text-zinc-600 pl-1">
+                      The Company utilizes independent contractors (hotels, transport operators) and is not financially responsible for delays caused by traffic, mechanical breakdowns, or the defaults of these third-party vendors. Room and vehicle seat allocations are determined by the Company. Any disputes regarding rooming or seating must be handled amicably and without disrupting the Tour.
+                    </p>
+                  </div>
+
+                  <div className="space-y-2">
+                    <p className="font-bold text-zinc-800 text-[11px]">3.3 Refunds & Cancellations</p>
+                    <p className="text-zinc-600 pl-1">
+                      No refunds will be issued for missed sightseeing or activities due to the Participant's delay. Absolutely no refunds will be provided if a Participant is removed from the Tour due to a breach of the Zero-Tolerance Policy, Code of Conduct, or safety guidelines. Cancellations prior to the Tour are subject to the standard cancellation policy.
+                    </p>
+                  </div>
+
+                  <div className="space-y-2">
+                    <p className="font-bold text-zinc-800 text-[11px]">3.4 Media Release</p>
+                    <p className="text-zinc-600 pl-1">
+                      I grant Ghumoo With Us the irrevocable right to photograph, record, and film me during the Tour. I consent to the use of these images and videos—including instances where I may be wearing Company merchandise provided as freebies—for marketing, social media, advertising, and commercial purposes without any compensation or prior approval.
+                    </p>
+                  </div>
                 </div>
 
+                {/* Part 4: Legal & Signatures */}
                 <div className="space-y-3">
-                  <p className="font-bold text-zinc-800 text-[11px]">6. Refund and Cancellation Policy</p>
-                  <p className="pl-1 text-zinc-600">
-                    Once the tour has commenced, no refunds, partial or full, will be provided for unutilized services, voluntary dropouts, or disciplinary expulsions.
-                  </p>
-                </div>
+                  <h4 className="font-bold text-rose-600 text-xs border-b border-zinc-100 pb-1 uppercase tracking-wider">
+                    Part 4: Legal & Signatures
+                  </h4>
 
-                <div className="space-y-3">
-                  <p className="font-bold text-zinc-800 text-[11px]">7. Media Content Release</p>
-                  <p className="pl-1 text-zinc-600">
-                    I hereby grant Ghumoo With Us the absolute right and permission to use any photographs, videos, or digital media captured of me during the tour for promotional, social media marketing, and internal record purposes without requiring further compensation or approval.
-                  </p>
-                </div>
+                  <div className="space-y-2">
+                    <p className="font-bold text-zinc-800 text-[11px]">4.1 Indemnity & Limitation of Liability</p>
+                    <p className="text-zinc-600 pl-1">
+                      I agree to fully indemnify and hold harmless Ghumoo With Us, its staff, and affiliates from any claims, lawsuits, costs, or damages arising out of my own negligent, reckless, or intentional actions during the Tour. To the maximum extent permitted by law, even in scenarios where the Company is found at fault, the total liability of the Company to the Participant shall strictly not exceed the total amount paid by the Participant for the Tour.
+                    </p>
+                  </div>
 
-                <div className="space-y-3">
-                  <p className="font-bold text-zinc-800 text-[11px]">8. Governing Law and Legal Jurisdiction</p>
-                  <p className="pl-1 text-zinc-600">
-                    This agreement shall be governed by and construed in accordance with the laws of India. Any legal disputes, claims, or proceedings arising out of this contract shall be subject to the exclusive jurisdiction of the competent courts in Kolkata, West Bengal only.
-                  </p>
+                  <div className="space-y-2">
+                    <p className="font-bold text-zinc-800 text-[11px]">4.2 Governing Law & Severability</p>
+                    <p className="text-zinc-600 pl-1">
+                      This agreement shall be governed by and construed in accordance with the laws of India. Any disputes arising from this agreement shall be subject to the exclusive jurisdiction of the courts in West Bengal, India. This document constitutes the entire agreement between the Participant and the Company. If any provision is found to be unenforceable, the remaining provisions shall continue in full force.
+                    </p>
+                  </div>
                 </div>
                 
                 <div className="pt-4 border-t border-zinc-200">
-                  <p className="font-bold text-zinc-900 text-center">
-                    FINAL DECLARATION
+                  <p className="font-bold text-zinc-900 text-center uppercase tracking-wider text-xs">
+                    Final Declaration
                   </p>
-                  <p className="mt-1 font-bold text-zinc-650 text-center text-[10px]">
-                    By providing my digital/uploaded signature below, I acknowledge that I have read this entire document carefully, understood its legal implications, and agree to be bound by all its terms voluntarily and under my own free will.
+                  <p className="mt-1 font-bold text-zinc-600 text-center text-[10px] leading-relaxed">
+                    I have read this entire agreement carefully, completely understand its terms, and recognize that I am giving up substantial legal and financial rights by signing it—specifically agreeing that the Company is not responsible for the consequences of my own rule violations. I sign it freely and voluntarily. By providing my digital/uploaded signature below, I acknowledge that I have read this entire document carefully, understood its legal implications, and agree to be bound by all its terms voluntarily and under my own free will.
                   </p>
                 </div>
               </div>
